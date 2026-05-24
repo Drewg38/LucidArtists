@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lucid Waveform Generator — Strong Bass</title>
+  <style>
+    :root{
+      --bg1:#071830; --bg2:#020611; --panel:rgba(11,22,54,.86); --line:rgba(151,180,255,.18);
+      --text:#f5f8ff; --muted:rgba(235,242,255,.84); --pink:#ff58df; --blue:#4ca8ff; --cyan:#42e9ff;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:var(--text);font-family:Inter,system-ui,sans-serif}
+    #lucid-wave-generator-v41{width:100vw;max-width:100vw;position:relative;left:50%;margin-left:-50vw;padding:20px 10px 18px;overflow:hidden}
+    .bg{position:absolute;inset:0;pointer-events:none;background:
+      radial-gradient(circle at 20% 15%, rgba(84,169,255,.25), transparent 18%),
+      radial-gradient(circle at 82% 20%, rgba(194,85,255,.20), transparent 18%),
+      radial-gradient(circle at 50% 65%, rgba(70,233,255,.12), transparent 24%);
+      filter:saturate(1.15)}
+    .page{position:relative;z-index:1;max-width:980px;margin:0 auto}
+    .hero{text-align:center;margin-bottom:20px}
+    .hero h1{margin:0;font-size:clamp(24px,3vw,34px);letter-spacing:.18em;text-transform:uppercase}
+    .hero p{margin:8px 0 0;color:var(--muted)}
+    .orb-wrap{display:grid;place-items:center;margin-bottom:18px}
+    .orb{
+      width:min(390px,82vw);height:min(390px,82vw);border-radius:50%;position:relative;display:grid;place-items:center;
+      background:
+        radial-gradient(circle at 25% 18%, rgba(255,255,255,.95), transparent 6%),
+        radial-gradient(circle at 28% 22%, rgba(255,255,255,.5), transparent 10%),
+        radial-gradient(circle at 24% 54%, rgba(255,78,220,.72), transparent 28%),
+        radial-gradient(circle at 72% 48%, rgba(50,204,255,.78), transparent 34%),
+        radial-gradient(circle at 70% 78%, rgba(0,0,0,.84), transparent 38%),
+        radial-gradient(circle at center,#543cff 0%,#253191 55%,#040915 100%);
+      border:1px solid rgba(236,241,255,.7);
+      box-shadow:0 0 50px rgba(255,255,255,.18),0 0 130px rgba(83,150,255,.55),0 0 180px rgba(255,76,218,.25), inset -120px -100px 160px rgba(0,0,0,.88), inset 70px 42px 110px rgba(255,255,255,.18)
+    }
+    .rings,.rings:before,.rings:after{
+      content:"";position:absolute;border-radius:50%;border:1px solid rgba(122,178,255,.22);pointer-events:none
+    }
+    .rings{inset:-8px;box-shadow:0 0 18px rgba(122,178,255,.10)}
+    .rings:before{inset:-18px}
+    .rings:after{inset:-32px}
+    .readout{position:absolute;top:34px;text-align:center;width:90%}
+    .readout .label{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.85);font-weight:800}
+    .readout .hz{font-size:clamp(58px,7vw,86px);line-height:.86;font-weight:900;text-shadow:0 0 18px rgba(255,255,255,.35),0 0 34px rgba(184,102,255,.44)}
+    .readout .name{margin-top:7px;font-size:18px;font-weight:700}
+    .wave-zone{position:absolute;left:50%;top:128px;transform:translateX(-50%);width:100vw;height:140px;pointer-events:none}
+    #waveCanvasV41{width:100vw;height:140px;display:block;filter:drop-shadow(0 0 12px rgba(70,159,255,.72)) drop-shadow(0 0 22px rgba(255,72,220,.42))}
+    .orb-controls{position:absolute;top:245px;left:50%;transform:translateX(-50%);width:min(320px,86%);display:grid;gap:8px}
+    .range-row{display:grid;grid-template-columns:28px 1fr 36px;gap:6px;align-items:center;font-size:11px;font-weight:800;text-transform:uppercase}
+    .range-row input{width:100%;height:7px;appearance:none;border-radius:999px;background:linear-gradient(90deg,var(--pink),var(--blue));outline:none}
+    .range-row input::-webkit-slider-thumb{appearance:none;width:14px;height:14px;border-radius:50%;background:#fff}
+    .play-btn{
+      position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+      width:60px;height:60px;border-radius:50%;border:2px solid rgba(245,229,255,.78);cursor:pointer;color:#fff;
+      background:radial-gradient(circle at 36% 30%,#ffcbff,#9651ff 48%,#1e56ff 100%);
+      box-shadow:0 0 34px rgba(255,255,255,.20),0 0 52px rgba(137,86,255,.76),inset 0 0 30px rgba(255,255,255,.24)
+    }
+    .rows{display:grid;gap:10px}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .panel{background:linear-gradient(180deg,rgba(14,22,62,.86),rgba(6,10,31,.92));border:1px solid var(--line);border-radius:16px;padding:10px;box-shadow:0 18px 50px rgba(0,0,0,.28)}
+    .panel h2{margin:0 0 8px;text-align:center;font-size:14px;letter-spacing:.15em;text-transform:uppercase}
+    .grid{display:grid;gap:8px}
+    .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+    button.card{
+      border:1px solid rgba(158,183,255,.16);border-radius:13px;background:linear-gradient(135deg,rgba(39,35,103,.74),rgba(7,14,49,.64));
+      color:#fff;cursor:pointer;padding:10px 8px;min-height:88px
+    }
+    button.card.active{box-shadow:0 0 26px rgba(255,77,220,.42),0 0 46px rgba(64,169,255,.22);border-color:rgba(255,255,255,.5)}
+    button.card strong{display:block;font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+    button.card small{display:block;margin-top:4px;color:var(--muted);font-size:11px;line-height:1.2}
+    .slim{display:grid;gap:6px}
+    .slim label{font-size:11px;color:var(--muted)}
+    .slim input{width:100%}
+    @media (max-width:760px){.row2{grid-template-columns:1fr}.grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:540px){.grid.four,.grid.three,.grid.two{grid-template-columns:1fr}.orb-controls{top:228px;width:min(290px,90%)}}
+  </style>
+</head>
+<body>
+<div id="lucid-wave-generator-v41">
+  <div class="bg"></div>
+  <main class="page">
+    <section class="hero">
+      <h1>Waveform Generator</h1>
+      <p>Tune your space. Align your energy. Expand your awareness.</p>
+    </section>
+
+    <section class="orb-wrap">
+      <div class="orb">
+        <div class="rings"></div>
+        <div class="readout">
+          <div class="label">Frequency (Hz)</div>
+          <div class="hz" id="hzValue">432</div>
+          <div class="name" id="presetName">Harmony</div>
+        </div>
+        <div class="wave-zone"><canvas id="waveCanvasV41" width="1920" height="250"></canvas></div>
+        <div class="orb-controls">
+          <label class="range-row"><span>Freq</span><input id="frequencySlider" type="range" min="1" max="20000" value="432" /><output id="underHz">432</output></label>
+          <label class="range-row"><span>Vol</span><input id="volume" type="range" min="0" max="1" step="0.01" value="0.70" /><output id="volumeValue">70%</output></label>
+        </div>
+        <button class="play-btn" id="playBtn" aria-label="Play tone">▶</button>
+      </div>
+    </section>
+
+    <div class="rows">
+      <div class="row2">
+        <section class="panel">
+          <h2>Mode</h2>
+          <div class="grid two">
+            <button class="card active" id="binauralModeBtn"><strong>Binaural</strong><small>Two ear tones create an inner beat.</small></button>
+            <button class="card" id="singleModeBtn"><strong>Single</strong><small>One clean tone for any space.</small></button>
+          </div>
+        </section>
+        <section class="panel">
+          <h2>Waveform</h2>
+          <div class="grid four" id="waveButtons"></div>
+        </section>
+      </div>
+
+      <div class="row2">
+        <section class="panel">
+          <h2>Sound Enrichment</h2>
+          <div class="grid three">
+            <button class="card active" id="stackToggle"><strong>Lucid Stack</strong><small>Sub, air, and detuned layers.</small></button>
+            <button class="card" id="breathToggle"><strong>Breath Motion</strong><small>Deep rolling body pulse.</small></button>
+            <button class="card" id="shimmerToggle"><strong>Shimmer</strong><small>Airy harmonic light.</small></button>
+          </div>
+        </section>
+        <section class="panel">
+          <h2>Effects</h2>
+          <div class="grid three">
+            <div class="slim"><button class="card" id="reverbToggle"><strong>Reverb</strong><small>Push the space wider.</small></button><label>Mix <input id="reverbAmount" type="range" min="0" max="2" step="0.01" value="0.90"></label></div>
+            <div class="slim"><button class="card" id="bassFxToggle"><strong>Bass</strong><small>Clean strong low-end.</small></button><label>Weight <input id="bassFxAmount" type="range" min="0" max="1" step="0.01" value="0.54"></label></div>
+            <div class="slim"><button class="card" id="oscillationToggle"><strong>Oscillation</strong><small>Stronger motion pulse.</small></button><label>Depth <input id="oscillationAmount" type="range" min="0" max="1" step="0.01" value="0.42"></label></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="row2">
+        <section class="panel">
+          <h2>Frequency Presets</h2>
+          <div class="grid four" id="presets"></div>
+        </section>
+        <section class="panel">
+          <h2>Lucid Combinations</h2>
+          <div class="grid four" id="combos"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+(() => {
+  const root = document.getElementById("lucid-wave-generator-v41");
+  if (!root) return;
+
+  const existing = window.__lucidWaveV41Instance;
+  if (existing && typeof existing.destroy === "function") existing.destroy();
+
+  const get = (id) => root.querySelector("#" + id);
+  const frequencySlider = get("frequencySlider");
+  const volume = get("volume");
+  const volumeValue = get("volumeValue");
+  const hzValue = get("hzValue");
+  const underHz = get("underHz");
+  const presetName = get("presetName");
+  const playBtn = get("playBtn");
+  const canvas = get("waveCanvasV41");
+  const ctx = canvas.getContext("2d");
+  const waveButtonsEl = get("waveButtons");
+  const presetsEl = get("presets");
+  const combosEl = get("combos");
+  const binauralModeBtn = get("binauralModeBtn");
+  const singleModeBtn = get("singleModeBtn");
+  const reverbAmount = get("reverbAmount");
+  const bassFxAmount = get("bassFxAmount");
+  const oscillationAmount = get("oscillationAmount");
+
+  const presets = [
+    { hz: 174, label: "Grounding" }, { hz: 285, label: "Restoration" }, { hz: 396, label: "Release" },
+    { hz: 417, label: "Reset" }, { hz: 432, label: "Harmony" }, { hz: 528, label: "Love / Repair" },
+    { hz: 639, label: "Connection" }, { hz: 741, label: "Clarity" }, { hz: 852, label: "Intuition" },
+    { hz: 963, label: "Source" }, { hz: 1111, label: "Gratitude" }, { hz: 1212, label: "Manifest" }
+  ];
+
+  const combos = {
+    root:{label:"Root Anchor", displayHz:174, tones:[174,348,396], beat:4, enrich:{breath:true}, fx:{reverb:true,bassFx:true}, sliders:{reverb:0.72,bassFx:0.62,oscillation:0.18}},
+    flow:{label:"Sacral Flow", displayHz:174, tones:[174,285,417], beat:5, enrich:{stack:true,breath:true,shimmer:true}, fx:{reverb:true,bassFx:true}, sliders:{reverb:0.92,bassFx:0.48,oscillation:0.22}},
+    focus:{label:"Focus Stack", displayHz:216, tones:[216,432,864], beat:7, enrich:{stack:true}, fx:{bassFx:true}, sliders:{reverb:0.42,bassFx:0.36,oscillation:0.12}},
+    heart:{label:"Heart Field", displayHz:174, tones:[174,528,639], beat:5, enrich:{stack:true,breath:true,shimmer:true}, fx:{reverb:true,bassFx:true}, sliders:{reverb:1.08,bassFx:0.52,oscillation:0.24}},
+    calm:{label:"Deep Calm", displayHz:174, tones:[174,285,432], beat:4, enrich:{breath:true}, fx:{reverb:true,bassFx:true}, sliders:{reverb:0.96,bassFx:0.44,oscillation:0.14}},
+    stillness:{label:"Stillness Light", displayHz:216, tones:[216,432,963], beat:4, enrich:{stack:true,shimmer:true}, fx:{reverb:true,oscillation:true}, sliders:{reverb:1.34,bassFx:0.18,oscillation:0.30}}
+  };
+
+  const waveforms = ["sine", "square", "triangle", "sawtooth"];
+  waveButtonsEl.innerHTML = waveforms.map((w, i) => `<button class="card ${i===0 ? "active" : ""}" data-wave="${w}"><strong>${w}</strong><small>${w === "sine" ? "Pure and smooth." : w === "square" ? "Edge and pulse." : w === "triangle" ? "Balanced harmonics." : "Bright and biting."}</small></button>`).join("");
+  presetsEl.innerHTML = presets.map((p) => `<button class="card ${p.hz===432 ? "active" : ""}" data-hz="${p.hz}"><strong>${p.hz} Hz</strong><small>${p.label}</small></button>`).join("");
+  combosEl.innerHTML = Object.entries(combos).map(([key, c]) => `<button class="card" data-combo="${key}"><strong>${c.label}</strong><small>${c.tones.join(" + ")} Hz</small></button>`).join("");
+
+  let audioContext = null;
+  let graph = null;
+  let isPlaying = false;
+  let isDestroyed = false;
+  let isBinaural = true;
+  let currentWaveform = "sine";
+  let phase = 0;
+  let beat = 7;
+  let harmonyTones = [];
+  let currentComboLabel = "";
+  let currentDisplayHz = null;
+  let rafId = null;
+
+  const enrich = { stack: true, breath: false, shimmer: false };
+  const fx = { reverb: false, bassFx: false, oscillation: false };
+
+  const waveButtons = () => [...root.querySelectorAll("[data-wave]")];
+  const presetButtons = () => [...root.querySelectorAll("[data-hz]")];
+  const comboButtons = () => [...root.querySelectorAll("[data-combo]")];
+
+  const hz = () => Math.min(20000, Math.max(1, Math.round(Number(frequencySlider.value) || 432)));
+  const currentTones = () => harmonyTones.length ? harmonyTones : [hz()];
+  const displayValue = () => currentDisplayHz !== null ? currentDisplayHz + "+" : hz();
+
+  function ensureAudioContext() {
+    if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    return audioContext;
+  }
+
+  function now() { return ensureAudioContext().currentTime; }
+
+  function smooth(param, value, time = 0.08) {
+    const t = now();
+    try {
+      param.cancelScheduledValues(t);
+      param.setTargetAtTime(value, t, time);
+    } catch {
+      param.value = value;
+    }
+  }
+
+  function stopNode(node) {
+    if (!node) return;
+    try { if (node.stop) node.stop(); } catch {}
+    try { if (node.disconnect) node.disconnect(); } catch {}
+  }
+
+  function makeImpulse(context, duration = 6, decay = 1.4) {
+    const length = Math.max(1, Math.floor(context.sampleRate * duration));
+    const impulse = context.createBuffer(2, length, context.sampleRate);
+    for (let c = 0; c < impulse.numberOfChannels; c += 1) {
+      const data = impulse.getChannelData(c);
+      for (let i = 0; i < length; i += 1) {
+        const progress = i / length;
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - progress, decay);
+      }
+    }
+    return impulse;
+  }
+
+  function updateReadout() {
+    hzValue.textContent = displayValue();
+    underHz.textContent = displayValue();
+    if (currentComboLabel) {
+      presetName.textContent = currentComboLabel;
+      return;
+    }
+    const match = presets.find((p) => p.hz === hz());
+    presetName.textContent = match ? match.label : "Custom Frequency";
+  }
+
+  function syncButtons() {
+    binauralModeBtn.classList.toggle("active", isBinaural);
+    singleModeBtn.classList.toggle("active", !isBinaural);
+    get("stackToggle").classList.toggle("active", enrich.stack);
+    get("breathToggle").classList.toggle("active", enrich.breath);
+    get("shimmerToggle").classList.toggle("active", enrich.shimmer);
+    get("reverbToggle").classList.toggle("active", fx.reverb);
+    get("bassFxToggle").classList.toggle("active", fx.bassFx);
+    get("oscillationToggle").classList.toggle("active", fx.oscillation);
+    waveButtons().forEach((b) => b.classList.toggle("active", b.dataset.wave === currentWaveform));
+  }
+
+  function clearHighlights() {
+    presetButtons().forEach((b) => b.classList.remove("active"));
+    comboButtons().forEach((b) => b.classList.remove("active"));
+  }
+
+  function resetTogglesAndSliders() {
+    enrich.stack = false;
+    enrich.breath = false;
+    enrich.shimmer = false;
+    fx.reverb = false;
+    fx.bassFx = false;
+    fx.oscillation = false;
+    reverbAmount.value = "0.90";
+    bassFxAmount.value = "0.54";
+    oscillationAmount.value = "0.42";
+  }
+
+  function stopGraph() {
+    if (!graph) return;
+    graph.oscillators.forEach(stopNode);
+    graph.nodes.forEach(stopNode);
+    graph = null;
+  }
+
+  function createOscillator(freq, type, gainValue, destination, detune = 0, pan = null) {
+    const context = ensureAudioContext();
+    const osc = context.createOscillator();
+    const gain = context.createGain();
+    osc.type = type;
+    osc.frequency.value = Math.max(1, Math.min(20000, freq));
+    osc.detune.value = detune;
+    gain.gain.value = gainValue;
+    if (pan !== null && context.createStereoPanner) {
+      const panner = context.createStereoPanner();
+      panner.pan.value = pan;
+      osc.connect(gain).connect(panner).connect(destination);
+      graph.nodes.push(panner);
+    } else {
+      osc.connect(gain).connect(destination);
+    }
+    osc.start();
+    graph.oscillators.push(osc, gain);
+  }
+
+  function buildGraph() {
+    const context = ensureAudioContext();
+    graph = { oscillators: [], nodes: [] };
+
+    const sourceBus = context.createGain();
+    const toneShelf = context.createBiquadFilter();
+    const toneWarmth = context.createBiquadFilter();
+    const tremolo = context.createGain();
+    const tremoloBase = context.createConstantSource();
+    const breathLfo = context.createOscillator();
+    const breathDepth = context.createGain();
+    const dryGain = context.createGain();
+    const reverbTone = context.createBiquadFilter();
+    const preDelay = context.createDelay(2.5);
+    const convolver = context.createConvolver();
+    const wetGain = context.createGain();
+    const master = context.createGain();
+
+    const shimmerBus = context.createGain();
+    const shimmerBand = context.createBiquadFilter();
+    const shimmerLow = context.createBiquadFilter();
+    const shimmerGain = context.createGain();
+
+    const bassBus = context.createGain();
+    const bassLow = context.createBiquadFilter();
+    const bassShelf = context.createBiquadFilter();
+    const bassComp = context.createDynamicsCompressor();
+    const bassDrive = context.createWaveShaper();
+    const bassGain = context.createGain();
+
+    toneShelf.type = "lowshelf";
+    toneShelf.frequency.value = 72;
+    toneShelf.gain.value = 7.2;
+
+    toneWarmth.type = "lowpass";
+    toneWarmth.frequency.value = 188;
+    toneWarmth.Q.value = 0.12;
+
+    tremolo.gain.value = 1;
+    tremoloBase.offset.value = 0.92;
+    breathLfo.frequency.value = 0.18;
+    breathDepth.gain.value = 0;
+    dryGain.gain.value = 1;
+    wetGain.gain.value = 0.52;
+    master.gain.value = Number(volume.value);
+
+    reverbTone.type = "highshelf";
+    reverbTone.frequency.value = 2400;
+    reverbTone.gain.value = 3.5;
+    convolver.buffer = makeImpulse(context, 7.5, 1.34);
+    convolver.normalize = true;
+
+    shimmerBand.type = "bandpass";
+    shimmerBand.frequency.value = 620;
+    shimmerBand.Q.value = 1.1;
+    shimmerLow.type = "lowpass";
+    shimmerLow.frequency.value = 940;
+    shimmerLow.Q.value = 0.6;
+    shimmerGain.gain.value = 0.28;
+
+    bassLow.type = "lowpass";
+    bassLow.frequency.value = 74;
+    bassLow.Q.value = 0.2;
+    bassShelf.type = "lowshelf";
+    bassShelf.frequency.value = 82;
+    bassShelf.gain.value = 10;
+    bassComp.threshold.value = -24;
+    bassComp.knee.value = 18;
+    bassComp.ratio.value = 3;
+    bassComp.attack.value = 0.02;
+    bassComp.release.value = 0.22;
+    bassGain.gain.value = 0;
+
+    const curve = new Float32Array(2048);
+    for (let i = 0; i < curve.length; i += 1) {
+      const x = i * 2 / (curve.length - 1) - 1;
+      curve[i] = Math.tanh(x * 1.6);
+    }
+    bassDrive.curve = curve;
+    bassDrive.oversample = "4x";
+
+    sourceBus.connect(toneShelf);
+    toneShelf.connect(toneWarmth);
+    toneWarmth.connect(tremolo);
+    tremolo.connect(dryGain).connect(master);
+    toneWarmth.connect(reverbTone).connect(preDelay).connect(convolver).connect(wetGain).connect(master);
+
+    shimmerBus.connect(shimmerBand).connect(shimmerLow).connect(shimmerGain).connect(sourceBus);
+
+    bassBus.connect(bassLow).connect(bassShelf).connect(bassComp).connect(bassDrive).connect(bassGain).connect(master);
+
+    tremoloBase.connect(tremolo.gain);
+    breathLfo.connect(breathDepth).connect(tremolo.gain);
+    master.connect(context.destination);
+
+    tremoloBase.start();
+    breathLfo.start();
+
+    Object.assign(graph, {
+      sourceBus, toneShelf, toneWarmth, tremolo, tremoloBase, breathLfo, breathDepth,
+      dryGain, reverbTone, preDelay, convolver, wetGain, master,
+      shimmerBus, shimmerBand, shimmerLow, shimmerGain, bassBus, bassLow, bassShelf, bassGain
+    });
+    graph.nodes.push(
+      sourceBus, toneShelf, toneWarmth, tremolo, tremoloBase, breathLfo, breathDepth,
+      dryGain, reverbTone, preDelay, convolver, wetGain, master,
+      shimmerBus, shimmerBand, shimmerLow, shimmerGain, bassBus, bassLow, bassShelf, bassComp, bassDrive, bassGain
+    );
+
+    const tones = currentTones();
+    const base = tones[0];
+
+    if (isBinaural) {
+      tones.forEach((tone, index) => {
+        const g = index === 0 ? 0.18 : 0.09;
+        createOscillator(Math.max(1, tone - beat / 2), currentWaveform, g, sourceBus, 0, -0.75);
+        createOscillator(Math.min(20000, tone + beat / 2), currentWaveform, g, sourceBus, 0, 0.75);
+      });
+    } else {
+      tones.forEach((tone, index) => createOscillator(tone, currentWaveform, index === 0 ? 0.30 : 0.12, sourceBus));
+    }
+
+    if (enrich.stack) {
+      createOscillator(base * 2, currentWaveform, 0.08, sourceBus, -7, isBinaural ? -0.22 : null);
+      createOscillator(base * 2, currentWaveform, 0.08, sourceBus, 7, isBinaural ? 0.22 : null);
+    }
+
+    createOscillator(Math.max(26, base / 5.2), "sine", isBinaural ? 0.09 : 0.13, sourceBus, 0, isBinaural ? -0.08 : null);
+    createOscillator(Math.max(26, base / 5.2), "sine", isBinaural ? 0.09 : 0.13, sourceBus, 0, isBinaural ? 0.08 : null);
+
+    if (fx.bassFx) {
+      createOscillator(Math.max(34, base / 10.4), "sine", 0.88, bassBus);
+      createOscillator(Math.max(48, base / 16.8), "sine", 0.44, bassBus);
+      createOscillator(Math.max(62, base / 24), "triangle", 0.14, bassBus);
+    }
+
+    if (enrich.shimmer) {
+      tones.slice(0, 3).forEach((tone) => createOscillator(Math.max(220, tone * 0.94), "triangle", 0.09, shimmerBus, -4));
+      tones.slice(0, 3).forEach((tone) => createOscillator(Math.max(250, tone * 1.06), "sine", 0.07, shimmerBus, 4));
+      createOscillator(Math.max(320, base * 1.18), "triangle", 0.05, shimmerBus);
+    }
+
+    applyLiveSettings();
+  }
+
+  function applyLiveSettings() {
+    if (!graph) return;
+
+    const reverbMix = Math.max(0, Math.min(2, Number(reverbAmount.value)));
+    const bassMix = Math.max(0, Math.min(1, Number(bassFxAmount.value)));
+    const oscillationMix = fx.oscillation ? Math.max(0, Math.min(1, Number(oscillationAmount.value))) : 0;
+    const extraReverb = fx.reverb ? Math.pow(reverbMix / 2, 1.2) : 0;
+    const breathDepthBase = enrich.breath ? 2.75 : 0;
+    const breathRateBase = enrich.breath ? 0.58 : 0.10;
+    const oscillationDepth = oscillationMix * 1.18;
+    const oscillationRate = 0.32 + oscillationMix * 2.4;
+
+    smooth(graph.master.gain, Number(volume.value), 0.03);
+    smooth(graph.dryGain.gain, 1 - extraReverb * 0.52, 0.10);
+    smooth(graph.toneShelf.gain, fx.bassFx ? 9.8 : 7.2, 0.10);
+    smooth(graph.toneWarmth.frequency, fx.bassFx ? 160 : 188, 0.10);
+    smooth(graph.tremoloBase.offset, 0.92 - oscillationMix * 0.42 - (enrich.breath ? 0.34 : 0), 0.12);
+    smooth(graph.breathDepth.gain, breathDepthBase + oscillationDepth, 0.12);
+    smooth(graph.breathLfo.frequency, oscillationMix > 0 ? oscillationRate : breathRateBase, 0.12);
+    smooth(graph.preDelay.delayTime, 0.04 + reverbMix * 0.32, 0.10);
+    smooth(graph.wetGain.gain, fx.reverb ? 0.45 + reverbMix * 5.8 : 0.0001, 0.12);
+    smooth(graph.reverbTone.gain, fx.reverb ? 3.5 + reverbMix * 6.8 : 0, 0.12);
+    smooth(graph.shimmerGain.gain, enrich.shimmer ? 0.4 : 0, 0.10);
+    smooth(graph.bassGain.gain, fx.bassFx ? 0.42 + Math.pow(bassMix, 1.1) * 1.95 : 0, 0.12);
+    smooth(graph.bassLow.frequency, 66 + bassMix * 28, 0.12);
+    smooth(graph.bassShelf.gain, 8 + bassMix * 12, 0.12);
+    graph.convolver.buffer = makeImpulse(ensureAudioContext(), 7.5 + reverbMix * 18, 1.34 - Math.min(reverbMix * 0.14, 0.42));
+  }
+
+  async function startTone() {
+    ensureAudioContext();
+    if (audioContext.state !== "running") await audioContext.resume();
+    stopGraph();
+    buildGraph();
+    isPlaying = true;
+    playBtn.textContent = "❚❚";
+  }
+
+  function stopTone() {
+    stopGraph();
+    isPlaying = false;
+    playBtn.textContent = "▶";
+  }
+
+  function rebuildAudioGraph() {
+    if (!isPlaying) return;
+    stopGraph();
+    buildGraph();
+  }
+
+  function updateFrequency(value) {
+    frequencySlider.value = value;
+    currentComboLabel = "";
+    currentDisplayHz = null;
+    harmonyTones = [];
+    clearHighlights();
+    resetTogglesAndSliders();
+    const valueHz = hz();
+    root.querySelector(`[data-hz="${valueHz}"]`)?.classList.add("active");
+    updateReadout();
+    syncButtons();
+    if (isPlaying) rebuildAudioGraph();
+  }
+
+  function setMode(useBinaural) {
+    isBinaural = useBinaural;
+    syncButtons();
+    rebuildAudioGraph();
+  }
+
+  function setWave(wave) {
+    currentWaveform = wave;
+    syncButtons();
+    rebuildAudioGraph();
+  }
+
+  function activateCombo(type) {
+    const config = combos[type];
+    if (!config) return;
+    clearHighlights();
+    root.querySelector(`[data-combo="${type}"]`)?.classList.add("active");
+    harmonyTones = [...config.tones];
+    beat = config.beat;
+    currentComboLabel = config.label;
+    currentDisplayHz = config.displayHz;
+    isBinaural = true;
+    enrich.stack = false;
+    enrich.breath = false;
+    enrich.shimmer = false;
+    fx.reverb = false;
+    fx.bassFx = false;
+    fx.oscillation = false;
+    Object.assign(enrich, config.enrich || {});
+    Object.assign(fx, config.fx || {});
+    reverbAmount.value = String(config.sliders?.reverb ?? 0.90);
+    bassFxAmount.value = String(config.sliders?.bassFx ?? 0.54);
+    oscillationAmount.value = String(config.sliders?.oscillation ?? 0.42);
+    frequencySlider.value = config.displayHz;
+    updateReadout();
+    syncButtons();
+    if (!isPlaying) startTone(); else rebuildAudioGraph();
+  }
+
+  function resizeCanvas() {
+    canvas.width = Math.max(1200, Math.floor(window.innerWidth * 2));
+    canvas.height = 250;
+  }
+
+  function drawWaveLayer({ width, height, amplitude, density, lineWidth, alpha, strokeStyle, waveform, layerOffset }) {
+    const centerY = height / 2;
+    ctx.beginPath();
+    ctx.lineWidth = lineWidth;
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = strokeStyle;
+    for (let x = 0; x <= width; x += 3) {
+      const t = x / width * Math.PI * density + phase + layerOffset;
+      let y = centerY + Math.sin(t) * amplitude;
+      if (waveform === "square") y = centerY + (Math.sin(t) >= 0 ? amplitude * 0.58 : -amplitude * 0.58);
+      if (waveform === "triangle") y = centerY + (2 / Math.PI) * Math.asin(Math.sin(t)) * amplitude;
+      if (waveform === "sawtooth") y = centerY + (2 * (t / (2 * Math.PI) - Math.floor(0.5 + t / (2 * Math.PI)))) * amplitude;
+      y += Math.sin(x / width * Math.PI * 6 + phase * 0.8 + layerOffset) * 8;
+      if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  function draw() {
+    if (isDestroyed) return;
+    const w = canvas.width;
+    const h = canvas.height;
+    const value = currentDisplayHz || hz();
+    const amp = isPlaying ? 56 + Number(volume.value) * 42 : 30;
+    const speed = isPlaying ? 0.07 + Math.min(value / 20000, 0.22) : 0.018;
+    const density = Math.min(30, Math.max(3, value / 72));
+
+    ctx.clearRect(0, 0, w, h);
+    const grad = ctx.createLinearGradient(0, 0, w, 0);
+    grad.addColorStop(0, "rgba(255,80,226,0)");
+    grad.addColorStop(0.18, "rgba(255,80,226,.92)");
+    grad.addColorStop(0.5, "rgba(255,255,255,.94)");
+    grad.addColorStop(0.82, "rgba(54,190,255,.92)");
+    grad.addColorStop(1, "rgba(54,190,255,0)");
+
+    for (let layer = 0; layer < 10; layer += 1) {
+      drawWaveLayer({ width: w, height: h, amplitude: amp, density, lineWidth: layer === 0 ? 5.2 : 1.2, alpha: layer === 0 ? 1 : 0.15, strokeStyle: grad, waveform: currentWaveform, layerOffset: layer * 0.38 });
+    }
+
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "rgba(255,255,255,.66)";
+    const centerY = h / 2;
+    for (let x = 0; x <= w; x += 5) {
+      const y = centerY + Math.cos(x / w * Math.PI * (density * 0.5) + phase * 1.2) * (amp * 0.26);
+      if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    if (isPlaying) phase += speed;
+    rafId = requestAnimationFrame(draw);
+  }
+
+  async function destroyInstance() {
+    isDestroyed = true;
+    if (rafId !== null) cancelAnimationFrame(rafId);
+    stopTone();
+    if (audioContext && audioContext.state !== "closed") {
+      try { await audioContext.close(); } catch {}
+    }
+  }
+
+  window.__lucidWaveV41Instance = { destroy: destroyInstance };
+
+  playBtn.addEventListener("click", async () => {
+    playBtn.disabled = true;
+    try {
+      if (isPlaying) stopTone(); else await startTone();
+    } finally {
+      playBtn.disabled = false;
+    }
+  });
+
+  binauralModeBtn.addEventListener("click", () => setMode(true));
+  singleModeBtn.addEventListener("click", () => setMode(false));
+  get("stackToggle").addEventListener("click", () => { enrich.stack = !enrich.stack; syncButtons(); rebuildAudioGraph(); });
+  get("breathToggle").addEventListener("click", () => { enrich.breath = !enrich.breath; syncButtons(); rebuildAudioGraph(); });
+  get("shimmerToggle").addEventListener("click", () => { enrich.shimmer = !enrich.shimmer; syncButtons(); rebuildAudioGraph(); });
+  get("reverbToggle").addEventListener("click", () => { fx.reverb = !fx.reverb; syncButtons(); rebuildAudioGraph(); });
+  get("bassFxToggle").addEventListener("click", () => { fx.bassFx = !fx.bassFx; syncButtons(); rebuildAudioGraph(); });
+  get("oscillationToggle").addEventListener("click", () => { fx.oscillation = !fx.oscillation; syncButtons(); rebuildAudioGraph(); });
+
+  frequencySlider.addEventListener("input", (e) => updateFrequency(e.target.value));
+  volume.addEventListener("input", () => { volumeValue.textContent = Math.round(Number(volume.value) * 100) + "%"; applyLiveSettings(); });
+  reverbAmount.addEventListener("input", applyLiveSettings);
+  bassFxAmount.addEventListener("input", applyLiveSettings);
+  oscillationAmount.addEventListener("input", applyLiveSettings);
+
+  waveButtons().forEach((b) => b.addEventListener("click", () => setWave(b.dataset.wave)));
+  presetButtons().forEach((b) => b.addEventListener("click", async () => { updateFrequency(b.dataset.hz); if (!isPlaying) await startTone(); }));
+  comboButtons().forEach((b) => b.addEventListener("click", () => activateCombo(b.dataset.combo)));
+
+  window.addEventListener("resize", resizeCanvas);
+  window.addEventListener("beforeunload", destroyInstance);
+
+  resizeCanvas();
+  updateReadout();
+  volumeValue.textContent = Math.round(Number(volume.value) * 100) + "%";
+  draw();
+})();
+</script>
+</body>
+</html>
