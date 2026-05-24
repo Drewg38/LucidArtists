@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lucid Waveform Generator</title>
+  <style>
+    #lucid-wave-generator-v40,
+    #lucid-wave-generator-v40 * { box-sizing: border-box; }
+    html, body { margin: 0; background: #05081d; }
+    #lucid-wave-generator-v40 {
+      --text:#f4f7ff;--muted:rgba(236,242,255,.88);--line:rgba(164,188,255,.18);
+      --panel-a:rgba(14,22,62,.86);--panel-b:rgba(6,10,31,.92);--pink:#ff58df;--blue:#4ca8ff;
+      --cyan:#42e9ff;--violet:#8b5cff;--gold:#ffc86b;--teal:#5ef0d4;--coral:#ff8f70;--lime:#b7ff6a;
+      --shadow:0 18px 50px rgba(0,0,0,.34);--radius:15px;--orb-shift:0deg;--orb-brightness:1.14;--bass-pulse:0;
+      position:relative;width:100%;min-height:100vh;overflow:visible;isolation:isolate;color:var(--text);
+      padding:14px 0 8px;background:
+        radial-gradient(circle at 18% 16%, rgba(84,169,255,.18), transparent 23%),
+        radial-gradient(circle at 81% 22%, rgba(194,85,255,.16), transparent 24%),
+        radial-gradient(circle at 50% 62%, rgba(70,233,255,.11), transparent 30%);
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:hidden;
+    }
+    #lucid-wave-generator-v40::before{
+      content:"";position:absolute;left:-12vw;right:-12vw;top:-140px;bottom:-18px;z-index:0;pointer-events:none;
+      background:
+        radial-gradient(circle at 10% 16%, rgba(65,158,255,.34), transparent 18%),
+        radial-gradient(circle at 22% 74%, rgba(77,235,255,.20), transparent 16%),
+        radial-gradient(circle at 49% 36%, rgba(131,89,255,.24), transparent 24%),
+        radial-gradient(circle at 72% 28%, rgba(255,90,222,.22), transparent 22%),
+        radial-gradient(circle at 92% 82%, rgba(255,181,89,.18), transparent 18%),
+        linear-gradient(180deg,#103b63 0%,#07183d 28%,#060d2a 58%,#030612 100%);
+      filter:saturate(1.2);
+    }
+    #lucid-wave-generator-v40 .bg-stars{
+      position:absolute;inset:-120px -12vw -12px;z-index:1;pointer-events:none;opacity:.82;
+      background-image:
+        radial-gradient(circle at 12% 44%, rgba(255,255,255,.78) 0 1px, transparent 1.3px),
+        radial-gradient(circle at 41% 58%, rgba(255,255,255,.56) 0 1px, transparent 1.2px),
+        radial-gradient(circle at 56% 67%, rgba(255,218,182,.34) 0 .8px, transparent 1px),
+        radial-gradient(circle at 69% 55%, rgba(255,255,255,.42) 0 .7px, transparent .9px),
+        radial-gradient(circle at 84% 61%, rgba(128,234,255,.38) 0 .7px, transparent .95px),
+        radial-gradient(circle at 95% 53%, rgba(255,255,255,.38) 0 .65px, transparent .9px),
+        radial-gradient(circle at 11% 63%, rgba(255,255,255,.40) 0 .7px, transparent .9px),
+        radial-gradient(circle at 26% 69%, rgba(138,210,255,.36) 0 .7px, transparent .95px),
+        radial-gradient(circle at 9% 92%, rgba(255,255,255,.44) 0 .7px, transparent .9px),
+        radial-gradient(circle at 34% 89%, rgba(255,246,214,.34) 0 .7px, transparent .95px),
+        radial-gradient(circle at 62% 91%, rgba(255,255,255,.40) 0 .7px, transparent .9px),
+        radial-gradient(circle at 88% 88%, rgba(146,223,255,.36) 0 .75px, transparent .95px);
+      background-size:
+        257px 233px,199px 181px,219px 211px,287px 205px,165px 175px,237px 187px,
+        201px 173px,233px 195px,181px 171px,245px 193px,221px 181px,261px 201px;
+      background-position:
+        54px 92px,132px 208px,242px 16px,284px 154px,310px 58px,118px 18px,
+        340px 208px,250px 102px,72px 264px,204px 274px,326px 256px,144px 324px;
+    }
+    #lucid-wave-generator-v40 .bg-nebula{position:absolute;inset:-60px -6vw auto;height:560px;z-index:2;pointer-events:none;background:radial-gradient(ellipse at 50% 30%, rgba(71,165,255,.28), transparent 42%),radial-gradient(ellipse at 42% 38%, rgba(255,86,221,.22), transparent 36%),radial-gradient(ellipse at 58% 41%, rgba(83,237,255,.20), transparent 38%),radial-gradient(ellipse at 66% 22%, rgba(255,196,107,.18), transparent 28%),radial-gradient(ellipse at 32% 24%, rgba(183,255,106,.12), transparent 22%),radial-gradient(ellipse at 78% 18%, rgba(255,143,112,.12), transparent 18%);filter:blur(18px);opacity:.92}
+    #lucid-wave-generator-v40 .bg-planet{position:absolute;z-index:3;pointer-events:none;border-radius:50%;opacity:.9;filter:saturate(1.6) contrast(1.2)}
+    #lucid-wave-generator-v40 .planet-a{width:194px;height:194px;left:-1%;top:8%;background:radial-gradient(circle at 18% 14%,rgba(255,255,255,.5),transparent 8%),radial-gradient(circle at 28% 18%,rgba(255,247,229,.62),transparent 10%),radial-gradient(circle at 54% 34%,rgba(73,230,255,.74),transparent 24%),radial-gradient(circle at 36% 54%,rgba(162,95,255,.42),transparent 28%),radial-gradient(circle at 44% 44%,rgba(91,246,255,.22),transparent 18%),radial-gradient(circle at 30% 62%,rgba(66,99,189,.54),transparent 40%),radial-gradient(circle at 76% 78%,rgba(1,8,34,.92),transparent 46%),linear-gradient(135deg,rgba(63,226,255,.94),rgba(70,108,255,.48) 24%,rgba(255,88,219,.28) 38%,rgba(84,61,201,.60) 48%,rgba(3,10,31,.96) 86%);box-shadow:inset -62px -54px 96px rgba(0,0,0,.8),inset 32px 22px 52px rgba(188,226,255,.32),0 0 52px rgba(66,151,255,.28),0 0 102px rgba(78,164,255,.14)}
+    #lucid-wave-generator-v40 .planet-b{width:96px;height:96px;left:6%;top:52%;background:radial-gradient(circle at 22% 16%,rgba(255,255,255,.44),transparent 8%),radial-gradient(circle at 60% 23%,rgba(255,224,197,.6),transparent 13%),radial-gradient(circle at 34% 38%,rgba(255,126,142,.68),transparent 32%),radial-gradient(circle at 64% 46%,rgba(255,112,208,.36),transparent 24%),radial-gradient(circle at 48% 22%,rgba(255,198,84,.22),transparent 16%),radial-gradient(circle at 71% 73%,rgba(8,10,42,.86),transparent 46%),linear-gradient(135deg,rgba(255,76,127,.96),rgba(255,161,70,.4) 26%,rgba(209,76,255,.58) 42%,rgba(94,61,208,.56) 58%,rgba(5,9,34,.94));box-shadow:inset -30px -24px 48px rgba(0,0,0,.76),inset 14px 10px 24px rgba(255,220,198,.24),0 0 46px rgba(255,117,214,.3)}
+    #lucid-wave-generator-v40 .planet-c{width:22px;height:22px;right:8%;top:14%;opacity:.62;background:radial-gradient(circle at 18% 14%,rgba(255,255,255,.46),transparent 8%),radial-gradient(circle at 62% 24%,rgba(255,232,205,.62),transparent 10%),radial-gradient(circle at 35% 35%,rgba(255,149,132,.56),transparent 31%),radial-gradient(circle at 52% 46%,rgba(255,88,223,.34),transparent 24%),radial-gradient(circle at 73% 74%,rgba(7,8,36,.88),transparent 47%),linear-gradient(135deg,rgba(255,128,82,.76),rgba(255,86,191,.34) 24%,rgba(98,233,255,.18) 34%,rgba(191,77,169,.44) 43%,rgba(5,8,32,.96));box-shadow:inset -6px -5px 10px rgba(0,0,0,.78),inset 2px 2px 4px rgba(255,212,184,.18),0 0 8px rgba(224,103,255,.08)}
+    #lucid-wave-generator-v40 .planet-c::before{content:"";position:absolute;left:-5px;right:-5px;top:5px;height:8px;border-radius:50%;border:1px solid rgba(210,101,255,.22);border-left-color:rgba(255,157,222,.36);border-bottom-color:rgba(120,69,210,.16);transform:rotate(-18deg)}
+    #lucid-wave-generator-v40 .planet-c::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(160deg,transparent 0 48%,rgba(0,0,0,.42) 49% 100%)}
+    #lucid-wave-generator-v40 .planet-d{width:72px;height:72px;right:13%;top:13%;background:radial-gradient(circle at 20% 16%,rgba(255,255,255,.42),transparent 8%),radial-gradient(circle at 34% 26%,rgba(244,255,255,.54),transparent 14%),radial-gradient(circle at 48% 42%,rgba(66,255,242,.34),transparent 24%),radial-gradient(circle at 61% 69%,rgba(4,10,38,.82),transparent 44%),linear-gradient(135deg,rgba(83,224,255,.92),rgba(88,103,255,.38) 28%,rgba(255,110,210,.14) 36%,rgba(39,68,174,.54),rgba(4,8,35,.94));box-shadow:inset -22px -20px 36px rgba(0,0,0,.74),inset 10px 8px 18px rgba(201,247,255,.22),0 0 34px rgba(70,170,255,.24)}
+    #lucid-wave-generator-v40 .planet-e{width:124px;height:124px;right:18%;top:31%;background:radial-gradient(circle at 24% 18%,rgba(255,255,255,.46),transparent 10%),radial-gradient(circle at 46% 28%,rgba(255,236,248,.6),transparent 14%),radial-gradient(circle at 58% 44%,rgba(255,121,223,.4),transparent 26%),radial-gradient(circle at 30% 56%,rgba(255,196,90,.2),transparent 18%),radial-gradient(circle at 70% 76%,rgba(7,6,32,.84),transparent 45%),linear-gradient(135deg,rgba(255,92,210,.98),rgba(105,255,225,.24) 22%,rgba(117,65,206,.54),rgba(5,8,31,.94));box-shadow:inset -38px -34px 62px rgba(0,0,0,.74),inset 16px 12px 28px rgba(255,211,246,.22),0 0 50px rgba(255,95,220,.32)}
+    #lucid-wave-generator-v40 .planet-f{width:110px;height:110px;left:18%;top:73%;background:radial-gradient(circle at 22% 16%,rgba(255,255,255,.44),transparent 8%),radial-gradient(circle at 33% 25%,rgba(231,255,242,.54),transparent 13%),radial-gradient(circle at 54% 42%,rgba(78,255,219,.4),transparent 24%),radial-gradient(circle at 44% 20%,rgba(162,255,220,.2),transparent 16%),radial-gradient(circle at 71% 74%,rgba(4,8,31,.84),transparent 45%),linear-gradient(135deg,rgba(67,233,255,.96),rgba(107,120,255,.26) 28%,rgba(255,106,222,.14) 36%,rgba(37,104,168,.48),rgba(2,7,29,.94));box-shadow:inset -30px -26px 48px rgba(0,0,0,.76),inset 12px 10px 24px rgba(197,255,250,.24),0 0 46px rgba(67,233,255,.3)}
+    #lucid-wave-generator-v40 .planet-g{width:134px;height:134px;left:22%;top:12%;background:radial-gradient(circle at 20% 16%,rgba(255,255,255,.46),transparent 8%),radial-gradient(circle at 38% 24%,rgba(255,247,210,.6),transparent 12%),radial-gradient(circle at 58% 46%,rgba(255,98,193,.3),transparent 22%),radial-gradient(circle at 48% 56%,rgba(255,138,74,.24),transparent 18%),radial-gradient(circle at 74% 76%,rgba(6,9,35,.86),transparent 44%),linear-gradient(135deg,rgba(255,226,87,1),rgba(255,126,210,.32) 24%,rgba(148,64,211,.46),rgba(5,8,32,.94));box-shadow:inset -34px -28px 54px rgba(0,0,0,.76),inset 14px 10px 22px rgba(255,228,188,.24),0 0 52px rgba(255,198,92,.32)}
+    #lucid-wave-generator-v40 .planet-h{width:86px;height:86px;right:33%;top:72%;background:radial-gradient(circle at 22% 16%,rgba(255,255,255,.42),transparent 8%),radial-gradient(circle at 36% 20%,rgba(255,244,252,.54),transparent 12%),radial-gradient(circle at 54% 42%,rgba(202,104,255,.4),transparent 22%),radial-gradient(circle at 46% 18%,rgba(255,196,102,.16),transparent 16%),radial-gradient(circle at 73% 74%,rgba(7,8,35,.84),transparent 45%),linear-gradient(135deg,rgba(203,123,255,.92),rgba(85,204,255,.28) 26%,rgba(72,104,255,.46),rgba(5,8,32,.93));box-shadow:inset -26px -24px 42px rgba(0,0,0,.72),inset 10px 8px 20px rgba(238,218,255,.22),0 0 38px rgba(168,118,255,.24)}
+    #lucid-wave-generator-v40 .planet-j{width:80px;height:80px;right:6%;top:39%;background:radial-gradient(circle at 22% 16%,rgba(255,255,255,.46),transparent 8%),radial-gradient(circle at 35% 20%,rgba(255,249,226,.52),transparent 12%),radial-gradient(circle at 52% 42%,rgba(255,166,98,.4),transparent 22%),radial-gradient(circle at 46% 18%,rgba(255,98,182,.16),transparent 14%),radial-gradient(circle at 70% 75%,rgba(8,10,34,.84),transparent 44%),linear-gradient(135deg,rgba(255,197,84,.98),rgba(255,98,193,.24) 26%,rgba(182,92,228,.44),rgba(5,8,31,.94));box-shadow:inset -22px -20px 38px rgba(0,0,0,.74),inset 8px 7px 18px rgba(255,230,194,.22),0 0 36px rgba(255,191,108,.24)}
+    #lucid-wave-generator-v40 .planet-k{width:98px;height:98px;left:10%;top:30%;background:radial-gradient(circle at 22% 16%,rgba(255,255,255,.44),transparent 8%),radial-gradient(circle at 35% 22%,rgba(255,255,255,.48),transparent 12%),radial-gradient(circle at 54% 42%,rgba(139,108,255,.4),transparent 22%),radial-gradient(circle at 34% 56%,rgba(255,105,213,.2),transparent 16%),radial-gradient(circle at 70% 74%,rgba(8,10,35,.84),transparent 44%),linear-gradient(135deg,rgba(95,143,255,.94),rgba(255,118,226,.28) 24%,rgba(111,71,214,.44),rgba(3,7,30,.94));box-shadow:inset -26px -24px 42px rgba(0,0,0,.74),inset 10px 8px 18px rgba(213,221,255,.22),0 0 40px rgba(95,133,255,.24)}
+    #lucid-wave-generator-v40 .planet-l{width:70px;height:70px;left:14%;top:20%;background:radial-gradient(circle at 22% 16%,rgba(255,255,255,.46),transparent 8%),radial-gradient(circle at 36% 20%,rgba(255,250,226,.54),transparent 12%),radial-gradient(circle at 52% 42%,rgba(255,206,102,.4),transparent 22%),radial-gradient(circle at 44% 18%,rgba(102,255,234,.14),transparent 14%),radial-gradient(circle at 70% 75%,rgba(7,9,32,.84),transparent 44%),linear-gradient(135deg,rgba(255,214,102,.94),rgba(96,255,235,.28) 24%,rgba(77,197,255,.42),rgba(3,7,30,.94));box-shadow:inset -20px -18px 32px rgba(0,0,0,.74),inset 8px 6px 14px rgba(255,234,190,.22),0 0 36px rgba(255,204,102,.24)}
+    #lucid-wave-generator-v40 .planet-m{width:86px;height:86px;left:30%;top:63%;background:radial-gradient(circle at 24% 16%,rgba(255,255,255,.46),transparent 8%),radial-gradient(circle at 34% 18%,rgba(255,255,255,.5),transparent 10%),radial-gradient(circle at 52% 42%,rgba(255,122,182,.4),transparent 22%),radial-gradient(circle at 42% 56%,rgba(255,218,83,.18),transparent 16%),radial-gradient(circle at 72% 74%,rgba(7,8,34,.84),transparent 44%),linear-gradient(145deg,rgba(255,125,140,.96),rgba(255,205,81,.34) 26%,rgba(255,161,81,.56),rgba(6,8,31,.94));box-shadow:inset -24px -22px 36px rgba(0,0,0,.72),inset 10px 8px 18px rgba(255,221,210,.22),0 0 44px rgba(255,140,120,.28)}
+    #lucid-wave-generator-v40 .planet-n{width:114px;height:114px;right:34%;top:9%;background:radial-gradient(circle at 22% 16%,rgba(255,255,255,.48),transparent 8%),radial-gradient(circle at 36% 22%,rgba(255,255,255,.52),transparent 12%),radial-gradient(circle at 54% 42%,rgba(183,255,106,.42),transparent 22%),radial-gradient(circle at 42% 56%,rgba(116,255,197,.2),transparent 16%),radial-gradient(circle at 72% 74%,rgba(8,10,35,.84),transparent 44%),linear-gradient(135deg,rgba(183,255,106,1),rgba(103,255,227,.28) 24%,rgba(48,194,146,.54),rgba(4,8,30,.94));box-shadow:inset -28px -26px 44px rgba(0,0,0,.74),inset 12px 10px 20px rgba(235,255,214,.22),0 0 48px rgba(183,255,106,.3)}
+    #lucid-wave-generator-v40 .planet-o{width:76px;height:76px;left:46%;top:80%;background:radial-gradient(circle at 22% 16%,rgba(255,255,255,.44),transparent 8%),radial-gradient(circle at 34% 22%,rgba(255,255,255,.48),transparent 12%),radial-gradient(circle at 52% 42%,rgba(99,255,239,.4),transparent 22%),radial-gradient(circle at 42% 56%,rgba(255,113,219,.14),transparent 16%),radial-gradient(circle at 72% 74%,rgba(7,8,34,.84),transparent 44%),linear-gradient(135deg,rgba(99,255,239,.96),rgba(173,105,255,.28) 24%,rgba(64,123,255,.44),rgba(4,8,30,.94));box-shadow:inset -20px -20px 30px rgba(0,0,0,.72),inset 8px 7px 16px rgba(218,255,252,.22),0 0 38px rgba(99,255,239,.24)}
+    #lucid-wave-generator-v40 .planet-p{width:100px;height:100px;right:9%;top:69%;background:radial-gradient(circle at 20% 14%,rgba(255,255,255,.48),transparent 8%),radial-gradient(circle at 34% 20%,rgba(255,242,210,.54),transparent 12%),radial-gradient(circle at 54% 42%,rgba(255,118,98,.44),transparent 24%),radial-gradient(circle at 42% 56%,rgba(255,214,101,.18),transparent 16%),radial-gradient(circle at 72% 74%,rgba(8,10,34,.86),transparent 44%),linear-gradient(135deg,rgba(255,178,82,1),rgba(255,99,166,.34) 24%,rgba(156,84,255,.48),rgba(5,8,31,.94));box-shadow:inset -26px -24px 42px rgba(0,0,0,.74),inset 10px 8px 20px rgba(255,229,194,.22),0 0 44px rgba(255,170,92,.28)}
+    #lucid-wave-generator-v40 .planet-q{width:120px;height:120px;left:6%;top:79%;background:radial-gradient(circle at 20% 14%,rgba(255,255,255,.48),transparent 8%),radial-gradient(circle at 36% 22%,rgba(237,255,255,.56),transparent 12%),radial-gradient(circle at 54% 42%,rgba(118,255,228,.42),transparent 24%),radial-gradient(circle at 42% 56%,rgba(104,132,255,.18),transparent 16%),radial-gradient(circle at 72% 74%,rgba(8,10,34,.86),transparent 44%),linear-gradient(135deg,rgba(96,255,235,.98),rgba(108,149,255,.36) 26%,rgba(83,92,255,.44),rgba(5,8,31,.94));box-shadow:inset -30px -26px 48px rgba(0,0,0,.74),inset 12px 10px 22px rgba(220,255,251,.22),0 0 48px rgba(99,255,239,.28)}
+    #lucid-wave-generator-v40 .planet-r{width:78px;height:78px;right:15%;top:4%;opacity:.54;background:radial-gradient(circle at 20% 12%,rgba(255,255,255,.52),transparent 8%),radial-gradient(circle at 34% 18%,rgba(255,245,214,.58),transparent 12%),radial-gradient(circle at 52% 38%,rgba(255,160,109,.36),transparent 24%),radial-gradient(circle at 38% 56%,rgba(255,104,204,.2),transparent 16%),radial-gradient(circle at 72% 74%,rgba(7,8,34,.88),transparent 46%),linear-gradient(135deg,rgba(255,197,113,1),rgba(255,102,188,.32) 24%,rgba(98,88,255,.46),rgba(4,8,31,.94));box-shadow:inset -18px -16px 28px rgba(0,0,0,.76),inset 7px 6px 12px rgba(255,236,194,.22),0 0 20px rgba(255,196,107,.14)}
+    #lucid-wave-generator-v40 .planet-r::before{content:"";position:absolute;left:-16px;right:-16px;top:24px;height:18px;border-radius:50%;border:2px solid rgba(255,201,122,.22);border-right-color:rgba(255,125,200,.22);border-bottom-color:rgba(102,96,255,.14);transform:rotate(12deg)}
+    #lucid-wave-generator-v40 .planet-s{width:84px;height:84px;left:40%;top:86%;background:radial-gradient(circle at 20% 14%,rgba(255,255,255,.48),transparent 8%),radial-gradient(circle at 36% 18%,rgba(219,255,245,.56),transparent 12%),radial-gradient(circle at 54% 42%,rgba(92,255,221,.4),transparent 24%),radial-gradient(circle at 42% 56%,rgba(255,121,205,.14),transparent 16%),radial-gradient(circle at 72% 74%,rgba(8,10,34,.86),transparent 44%),linear-gradient(135deg,rgba(82,255,214,.96),rgba(104,113,255,.3) 26%,rgba(58,114,204,.4),rgba(5,8,31,.94));box-shadow:inset -24px -22px 38px rgba(0,0,0,.74),inset 10px 8px 18px rgba(210,255,241,.22),0 0 40px rgba(92,255,221,.26)}
+    #lucid-wave-generator-v40 .page{position:relative;z-index:4;width:min(980px,100%);margin:0 auto;padding:0 8px 2px}
+    #lucid-wave-generator-v40 .hero{text-align:center;margin:0 0 32px}
+    #lucid-wave-generator-v40 .hero h1{margin:0;font-size:clamp(22px,2.6vw,32px);letter-spacing:.22em;font-weight:680;color:rgba(238,242,255,.94);text-transform:uppercase}
+    #lucid-wave-generator-v40 .hero p{margin:5px 0 0;color:var(--muted);font-size:14px}
+    #lucid-wave-generator-v40 .globe-stage{position:relative;display:grid;place-items:center;min-height:470px;margin:0 0 42px;z-index:4;overflow:visible}
+    #lucid-wave-generator-v40 .globe{position:relative;width:min(398px,75vw);height:min(398px,75vw);aspect-ratio:1/1;border-radius:50%;display:grid;place-items:center;isolation:isolate;overflow:visible;border:1px solid rgba(236,241,255,.72);background:radial-gradient(circle at 22% 10%, rgba(255,255,255,1), transparent 4%),radial-gradient(circle at 27% 13%, rgba(255,255,255,.96), transparent 6%),radial-gradient(circle at 31% 17%, rgba(255,255,255,.84), transparent 9%),radial-gradient(circle at 37% 23%, rgba(238,248,255,.54), transparent 11%),radial-gradient(circle at 24% 54%, rgba(255,78,220,.74), transparent 30%),radial-gradient(circle at 72% 48%, rgba(50,204,255,.78), transparent 34%),radial-gradient(circle at 50% 18%, rgba(195,97,255,.68), transparent 30%),radial-gradient(circle at 37% 72%, rgba(255,122,231,.26), transparent 28%),radial-gradient(circle at 63% 63%, rgba(115,255,235,.20), transparent 16%),radial-gradient(circle at 56% 56%, rgba(255,255,255,.10), transparent 14%),radial-gradient(circle at 72% 76%, rgba(0,0,0,.84), transparent 38%),radial-gradient(circle at 84% 90%, rgba(0,0,0,.99), transparent 38%),radial-gradient(circle at center, #5b3cff 0%, #3c31bf 26%, #1d2f8d 51%, #0a1a4b 73%, #020511 100%);box-shadow:0 0 50px rgba(255,255,255,.22),0 0 150px rgba(83,150,255,.90),0 0 210px rgba(255,76,218,.42),inset 118px 74px 138px rgba(247,252,255,.48),inset 56px 34px 90px rgba(255,255,255,.22),inset 0 0 38px rgba(255,255,255,.08),inset -144px -120px 180px rgba(0,0,0,.96),inset -66px -68px 132px rgba(0,0,0,.76),0 28px 84px rgba(0,0,0,.36);filter:saturate(var(--orb-brightness)) hue-rotate(var(--orb-shift));transition:filter .18s ease}
+    #lucid-wave-generator-v40 .globe::before{content:"";position:absolute;inset:-10px;border-radius:50%;background:radial-gradient(ellipse at 19% 8%, rgba(255,255,255,.96), transparent 9%),radial-gradient(ellipse at 28% 15%, rgba(255,255,255,.62), transparent 11%),radial-gradient(ellipse at 40% 26%, rgba(255,255,255,.24), transparent 12%),radial-gradient(ellipse at 49% 31%, rgba(145,225,255,.18), transparent 14%),radial-gradient(ellipse at 66% 78%, rgba(0,0,0,.52), transparent 36%),linear-gradient(126deg, rgba(255,255,255,.18), transparent 26%, rgba(0,0,0,.40) 82%);mix-blend-mode:screen;pointer-events:none}
+    #lucid-wave-generator-v40 .globe::after{content:"";position:absolute;inset:-24px;border-radius:50%;z-index:-1;background:conic-gradient(from 130deg, var(--pink), var(--violet), var(--blue), var(--cyan), var(--pink));filter:blur(22px);opacity:.92;pointer-events:none}
+    #lucid-wave-generator-v40 .globe-atmosphere{position:absolute;inset:-12px;border-radius:50%;z-index:1;pointer-events:none;background:radial-gradient(circle at 22% 10%, rgba(255,255,255,.26), transparent 11%),radial-gradient(circle at 50% 50%, transparent 58%, rgba(138,191,255,.14) 71%, rgba(90,133,255,.14) 84%, rgba(17,28,64,0) 100%);mix-blend-mode:screen;opacity:.9}
+    #lucid-wave-generator-v40 .globe-surface{position:absolute;inset:5%;border-radius:50%;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 34% 28%, rgba(255,255,255,.06), transparent 18%),radial-gradient(ellipse at 45% 42%, rgba(255,255,255,.03), transparent 20%),radial-gradient(ellipse at 60% 52%, rgba(0,0,0,.08), transparent 24%),linear-gradient(155deg, rgba(255,255,255,.03), transparent 34%, rgba(0,0,0,.10) 84%);opacity:.82}
+    #lucid-wave-generator-v40 .globe-terminator{position:absolute;inset:0;border-radius:50%;z-index:2;pointer-events:none;background:radial-gradient(circle at 75% 78%, rgba(0,0,0,.18), transparent 24%),linear-gradient(145deg, transparent 0 36%, rgba(6,10,31,.06) 48%, rgba(0,0,0,.28) 72%, rgba(0,0,0,.58) 100%);mix-blend-mode:multiply;opacity:.94}
+    #lucid-wave-generator-v40 .globe-rim{position:absolute;inset:-4px;border-radius:50%;z-index:3;pointer-events:none;background:radial-gradient(circle at 20% 9%, rgba(255,255,255,.90), transparent 11%),radial-gradient(circle at 58% 32%, rgba(255,255,255,.08), transparent 12%),conic-gradient(from 188deg, rgba(255,255,255,.02), rgba(255,255,255,.24), rgba(255,255,255,.04), rgba(255,255,255,.18), rgba(255,255,255,.02));mix-blend-mode:screen;opacity:.88}
+    #lucid-wave-generator-v40 .bass-rings{position:absolute;inset:-48px;z-index:0;pointer-events:none;border-radius:50%;opacity:calc(.12 + var(--bass-pulse) * .28);transform:scale(calc(1 + var(--bass-pulse) * .1));transition:opacity .08s linear, transform .08s linear}
+    #lucid-wave-generator-v40 .bass-ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(122,178,255,.22);box-shadow:0 0 18px rgba(122,178,255,.12), inset 0 0 18px rgba(255,255,255,.04);mix-blend-mode:screen}
+    #lucid-wave-generator-v40 .bass-ring:nth-child(1){inset:8px;opacity:calc(.24 + var(--bass-pulse) * .34);transform:scale(calc(1 + var(--bass-pulse) * .06))}
+    #lucid-wave-generator-v40 .bass-ring:nth-child(2){inset:-8px;opacity:calc(.16 + var(--bass-pulse) * .24);transform:scale(calc(1 + var(--bass-pulse) * .12))}
+    #lucid-wave-generator-v40 .bass-ring:nth-child(3){inset:-26px;opacity:calc(.10 + var(--bass-pulse) * .18);transform:scale(calc(1 + var(--bass-pulse) * .18))}
+    #lucid-wave-generator-v40 .globe-interior{position:relative;z-index:4;width:100%;height:100%;display:grid;place-items:center;text-align:center;padding:22px 20px 12px}
+    #lucid-wave-generator-v40 .readout{position:absolute;z-index:5;top:32px;left:50%;transform:translateX(-50%);width:max-content;max-width:88%;text-align:center;pointer-events:none}
+    #lucid-wave-generator-v40 .readout-label{margin-bottom:6px;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.84);font-weight:800}
+    #lucid-wave-generator-v40 .hz-number{font-size:clamp(56px,6.6vw,82px);line-height:.84;font-weight:900;letter-spacing:-.05em;color:#f7edff;text-shadow:0 0 18px rgba(255,255,255,.46), 0 0 38px rgba(184,102,255,.66), 0 0 64px rgba(76,181,255,.20)}
+    #lucid-wave-generator-v40 .preset-popup{margin-top:8px;min-height:22px;font-size:17px;font-weight:700;letter-spacing:.02em;color:rgba(255,255,255,.94);text-shadow:0 0 12px rgba(255,255,255,.18), 0 0 24px rgba(115,138,255,.22)}
+    #lucid-wave-generator-v40 .wave-zone{position:absolute;z-index:4;left:50%;top:126px;width:100vw;height:144px;display:grid;place-items:center;pointer-events:none;overflow:visible;transform:translateX(-50%)}
+    #lucid-wave-generator-v40 #waveCanvasV40{width:100vw;height:144px;filter:drop-shadow(0 0 12px rgba(70,159,255,.72)) drop-shadow(0 0 22px rgba(255,72,220,.42));pointer-events:none}
+    #lucid-wave-generator-v40 .orb-controls{position:absolute;z-index:8;left:50%;top:246px;transform:translateX(-50%);width:min(324px,86%);display:grid;gap:7px;pointer-events:auto;text-align:center}
+    #lucid-wave-generator-v40 .orb-slider-row{display:grid;grid-template-columns:28px 1fr 30px;gap:3px;align-items:center;color:rgba(255,255,255,.92);font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;text-align:left}
+    #lucid-wave-generator-v40 .orb-slider-row.is-volume{grid-template-columns:24px 1fr 30px;gap:3px;width:min(290px,100%);justify-self:center}
+    #lucid-wave-generator-v40 .orb-slider-row output{color:#fff;text-align:right;font-size:11px;font-weight:800;letter-spacing:0;text-transform:none}
+    #lucid-wave-generator-v40 .orb-slider-row input{width:100%;height:7px;appearance:none;border-radius:999px;outline:none;background:linear-gradient(90deg, var(--pink), var(--blue));box-shadow:0 0 12px rgba(115,138,255,.22);cursor:pointer}
+    #lucid-wave-generator-v40 .orb-slider-row input::-webkit-slider-thumb{appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;border:0;box-shadow:0 0 14px rgba(255,255,255,.82), 0 0 22px rgba(126,126,255,.34)}
+    #lucid-wave-generator-v40 .orb-slider-row input::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;border:0;box-shadow:0 0 14px rgba(255,255,255,.82), 0 0 22px rgba(126,126,255,.34)}
+    #lucid-wave-generator-v40 .play-button{position:absolute;z-index:8;left:50%;bottom:12px;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;border:2px solid rgba(245,229,255,.78);background:radial-gradient(circle at 36% 30%, #ffcbff, #9651ff 48%, #1e56ff 100%);display:grid;place-items:center;color:#fff;cursor:pointer;box-shadow:0 0 34px rgba(255,255,255,.20), 0 0 52px rgba(137,86,255,.76), inset 0 0 30px rgba(255,255,255,.24)}
+    #lucid-wave-generator-v40 .play-button span{display:grid;place-items:center;width:100%;height:100%}
+    #lucid-wave-generator-v40 .play-icon{transform:translateX(3px);font-size:25px}
+    #lucid-wave-generator-v40 .pause-icon-svg{width:18px;height:18px;overflow:visible;filter:drop-shadow(0 0 6px rgba(255,255,255,.12))}
+    #lucid-wave-generator-v40 .pause-icon-svg rect{fill:#fff;rx:1.5}
+    #lucid-wave-generator-v40 .panel{background:linear-gradient(180deg, var(--panel-a), var(--panel-b));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow), inset 0 0 18px rgba(88,132,255,.04);backdrop-filter:blur(16px);min-width:0;overflow:hidden}
+    #lucid-wave-generator-v40 .panel-title{text-align:center;margin:0 0 7px;font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.94);font-weight:800}
+    #lucid-wave-generator-v40 .compact-panel{padding:8px;position:relative;z-index:2;min-width:0}
+    #lucid-wave-generator-v40 .top-row,#lucid-wave-generator-v40 .middle-row,#lucid-wave-generator-v40 .bottom-row,#lucid-wave-generator-v40 .final-row{max-width:960px;margin-left:auto;margin-right:auto;position:relative;z-index:4}
+    #lucid-wave-generator-v40 .top-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;align-items:stretch}
+    #lucid-wave-generator-v40 .middle-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;align-items:stretch}
+    #lucid-wave-generator-v40 .top-row>.panel,#lucid-wave-generator-v40 .middle-row>.panel{height:100%}
+    #lucid-wave-generator-v40 .bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+    #lucid-wave-generator-v40 .final-row{display:grid;grid-template-columns:1fr;gap:8px}
+    #lucid-wave-generator-v40 .option-grid{display:grid;gap:3px;align-items:start}
+    #lucid-wave-generator-v40 .mode-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:3px}
+    #lucid-wave-generator-v40 .wave-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+    #lucid-wave-generator-v40 .enrich-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+    #lucid-wave-generator-v40 .effect-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    #lucid-wave-generator-v40 .option-btn,#lucid-wave-generator-v40 .effect-btn,#lucid-wave-generator-v40 .preset-card,#lucid-wave-generator-v40 .combo-card{border:0;font:inherit}
+    #lucid-wave-generator-v40 .option-btn,#lucid-wave-generator-v40 .effect-btn{background:transparent;color:#fff;cursor:pointer;display:grid;place-items:center;gap:4px;text-align:center;padding:0;min-width:0}
+    #lucid-wave-generator-v40 .option-orb,#lucid-wave-generator-v40 .effect-orb{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(150,183,255,.25);background:conic-gradient(from 30deg, var(--pink), var(--violet), var(--blue), var(--pink));box-shadow:0 0 18px rgba(114,133,255,.14);position:relative;margin:0 auto}
+    #lucid-wave-generator-v40 .mode-panel .option-orb,#lucid-wave-generator-v40 .enrich-panel .option-orb{width:52px;height:52px}
+    #lucid-wave-generator-v40 .option-orb::after,#lucid-wave-generator-v40 .effect-orb::after{content:"";position:absolute;inset:6px;border-radius:50%;background:#101747}
+    #lucid-wave-generator-v40 .option-orb span,#lucid-wave-generator-v40 .effect-orb span{position:relative;z-index:2;font-size:20px}
+    #lucid-wave-generator-v40 .option-orb svg{position:relative;z-index:2;width:36px;height:22px;stroke:#fff;fill:none;stroke-width:2.2}
+    #lucid-wave-generator-v40 .option-btn.active .option-orb,#lucid-wave-generator-v40 .effect-btn.active .effect-orb{box-shadow:0 0 28px rgba(255,77,220,.95), 0 0 56px rgba(64,169,255,.60), 0 0 88px rgba(255,255,255,.18);border-color:rgba(255,255,255,.68)}
+    #lucid-wave-generator-v40 .preset-card.active,#lucid-wave-generator-v40 .combo-card.active{box-shadow:0 0 26px rgba(255,77,220,.52), 0 0 46px rgba(64,169,255,.30), 0 0 72px rgba(255,255,255,.09);border-color:rgba(255,255,255,.58)}
+    #lucid-wave-generator-v40 .option-btn strong,#lucid-wave-generator-v40 .effect-btn strong,#lucid-wave-generator-v40 .preset-card strong,#lucid-wave-generator-v40 .combo-card strong{font-size:11px;letter-spacing:.05em;text-transform:uppercase;line-height:1.08}
+    #lucid-wave-generator-v40 .option-btn p,#lucid-wave-generator-v40 .effect-btn small,#lucid-wave-generator-v40 .preset-card p,#lucid-wave-generator-v40 .combo-card p{margin:0 auto;color:var(--muted);font-size:11px;line-height:1.12;max-width:112px}
+    #lucid-wave-generator-v40 #stackToggleV40{grid-column:1}
+    #lucid-wave-generator-v40 #breathToggleV40{grid-column:2}
+    #lucid-wave-generator-v40 #shimmerToggleV40{grid-column:3}
+    #lucid-wave-generator-v40 .effect-control{display:grid;place-items:center;gap:10px;text-align:center;min-width:0}
+    #lucid-wave-generator-v40 .effect-slider{width:100%;max-width:108px;display:grid;grid-template-columns:1fr;gap:0;align-items:center;color:var(--muted);font-size:0;letter-spacing:0;margin-top:4px}
+    #lucid-wave-generator-v40 .effect-slider span{display:none}
+    #lucid-wave-generator-v40 .effect-slider input{width:100%;height:3px;accent-color:var(--pink)}
+    #lucid-wave-generator-v40 .presets,#lucid-wave-generator-v40 .combo-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+    #lucid-wave-generator-v40 .preset-card,#lucid-wave-generator-v40 .combo-card{border:1px solid rgba(158,183,255,.16);border-radius:13px;background:linear-gradient(135deg, rgba(39,35,103,.74), rgba(7,14,49,.64));color:#fff;cursor:pointer;padding:10px 8px 8px;text-align:center;min-height:148px;display:grid;place-items:center;gap:6px;min-width:0}
+    #lucid-wave-generator-v40 .preset-planet{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;margin:0 auto;border:1px solid rgba(255,255,255,.16);box-shadow:inset -10px -10px 17px rgba(0,0,0,.34), 0 0 10px rgba(91,132,255,.18);font-size:13px;font-weight:900;line-height:1.08;padding:4px;text-align:center}
+    #lucid-wave-generator-v40 .preset-card p{display:none}
+    #lucid-wave-generator-v40 .preset-card:nth-child(1) .preset-planet{background:radial-gradient(circle at 35% 28%, rgba(255,255,255,.28), transparent 20%), radial-gradient(circle, #a829be, #241147 76%)}
+    #lucid-wave-generator-v40 .preset-card:nth-child(2) .preset-planet{background:radial-gradient(circle at 35% 28%, rgba(255,255,255,.28), transparent 20%), radial-gradient(circle, #ff4b1f, #391137 76%)}
+    #lucid-wave-generator-v40 .preset-card:nth-child(3) .preset-planet{background:radial-gradient(circle at 35% 28%, rgba(255,255,255,.28), transparent 20%), radial-gradient(circle, #e72abf, #241147 76%)}
+    #lucid-wave-generator-v40 .preset-card:nth-child(4) .preset-planet{background:radial-gradient(circle at 35% 28%, rgba(255,255,255,.28), transparent 20%), radial-gradient(circle, #3655ff, #071a67 76%)}
+    #lucid-wave-generator-v40 .preset-card:nth-child(5) .preset-planet{background:radial-gradient(circle at 35% 28%, rgba(255,255,255,.28), transparent 20%), radial-gradient(circle, #c61bc9, #15145b 76%)}
+    #lucid-wave-generator-v40 .preset-card:nth-child(6) .preset-planet{background:radial-gradient(circle at 35% 28%, rgba(255,255,255,.28), transparent 20%), radial-gradient(circle, #6a38ff, #19146e 76%)}
+    #lucid-wave-generator-v40 .preset-card:nth-child(7) .preset-planet{background:radial-gradient(circle at 35% 28%, rgba(255,255,255,.28), transparent 20%), radial-gradient(circle, #0fa9e8, #14264f 76%)}
+    #lucid-wave-generator-v40 .preset-card:nth-child(8) .preset-planet{background:radial-gradient(circle at 35% 28%, rgba(255,255,255,.28), transparent 20%), radial-gradient(circle, #19c4d3, #10324d 76%)}
+    #lucid-wave-generator-v40 .preset-card:nth-child(9) .preset-planet{background:radial-gradient(circle at 35% 28%, rgba(255,255,255,.28), transparent 20%), radial-gradient(circle, #e02b9f, #3d1638 76%)}
+    #lucid-wave-generator-v40 .preset-card:nth-child(10) .preset-planet{background:radial-gradient(circle at 35% 28%, rgba(255,255,255,.28), transparent 20%), radial-gradient(circle, #ff662f, #3b111c 76%)}
+    #lucid-wave-generator-v40 .preset-card:nth-child(11) .preset-planet{background:radial-gradient(circle at 35% 28%, rgba(255,255,255,.28), transparent 20%), radial-gradient(circle, #ffb84d, #3b1b11 76%)}
+    #lucid-wave-generator-v40 .preset-card:nth-child(12) .preset-planet{background:radial-gradient(circle at 35% 28%, rgba(255,255,255,.28), transparent 20%), radial-gradient(circle, #b86bff, #14114a 76%)}
+    #lucid-wave-generator-v40 .combo-orb{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(150,183,255,.25);background:conic-gradient(from 30deg, var(--pink), var(--violet), var(--blue), var(--pink));box-shadow:0 0 12px rgba(114,133,255,.14);position:relative;margin:0 auto;color:#fff;font-size:20px}
+    #lucid-wave-generator-v40 .combo-orb::after{content:"";position:absolute;inset:6px;border-radius:50%;background:#101747}
+    #lucid-wave-generator-v40 .combo-orb span{position:relative;z-index:2}
+    #lucid-wave-generator-v40 .info-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+    #lucid-wave-generator-v40 .info-item{display:grid;grid-template-columns:38px 1fr;gap:9px;align-items:start;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:12px}
+    #lucid-wave-generator-v40 .info-icon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(255,88,223,.12);border:1px solid rgba(255,88,223,.22);font-size:17px}
+    #lucid-wave-generator-v40 .info-item strong{display:block;font-size:12px;letter-spacing:.05em;text-transform:uppercase;line-height:1.14}
+    #lucid-wave-generator-v40 .info-item p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.28}
+    @media (max-width:980px){#lucid-wave-generator-v40 .planet-a,#lucid-wave-generator-v40 .planet-c,#lucid-wave-generator-v40 .planet-g,#lucid-wave-generator-v40 .planet-n,#lucid-wave-generator-v40 .planet-r{opacity:.56}#lucid-wave-generator-v40 .planet-c{width:18px;height:18px;right:7%;top:14%}#lucid-wave-generator-v40 .planet-c::before{left:-4px;right:-4px;top:4px;height:6px}#lucid-wave-generator-v40 .planet-r{width:58px;height:58px;right:14%;top:4%}#lucid-wave-generator-v40 .planet-r::before{left:-12px;right:-12px;top:18px;height:14px;border-width:2px}}
+    @media (max-width:860px){#lucid-wave-generator-v40 .presets,#lucid-wave-generator-v40 .combo-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#lucid-wave-generator-v40 .info-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:760px){#lucid-wave-generator-v40 .top-row,#lucid-wave-generator-v40 .middle-row,#lucid-wave-generator-v40 .bottom-row{grid-template-columns:1fr}#lucid-wave-generator-v40 .page{padding:0 10px 2px}#lucid-wave-generator-v40 .globe-stage{min-height:410px}#lucid-wave-generator-v40 .globe{width:min(360px,86vw);height:min(360px,86vw)}#lucid-wave-generator-v40 .wave-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#lucid-wave-generator-v40 .enrich-grid,#lucid-wave-generator-v40 .effect-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#lucid-wave-generator-v40 .presets,#lucid-wave-generator-v40 .combo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#lucid-wave-generator-v40 .info-grid{grid-template-columns:1fr}#lucid-wave-generator-v40 .planet-b,#lucid-wave-generator-v40 .planet-d,#lucid-wave-generator-v40 .planet-e,#lucid-wave-generator-v40 .planet-f,#lucid-wave-generator-v40 .planet-h,#lucid-wave-generator-v40 .planet-j,#lucid-wave-generator-v40 .planet-k,#lucid-wave-generator-v40 .planet-l,#lucid-wave-generator-v40 .planet-m,#lucid-wave-generator-v40 .planet-o,#lucid-wave-generator-v40 .planet-p,#lucid-wave-generator-v40 .planet-q,#lucid-wave-generator-v40 .planet-s{display:none}#lucid-wave-generator-v40 .orb-controls{top:232px;width:min(306px,88%)}#lucid-wave-generator-v40 .planet-c{width:14px;height:14px;right:6%;top:14%}#lucid-wave-generator-v40 .planet-c::before{display:none}#lucid-wave-generator-v40 .planet-r{width:42px;height:42px;right:12%;top:4%}#lucid-wave-generator-v40 .planet-r::before{left:-8px;right:-8px;top:13px;height:10px;border-width:1.5px}}
+    @media (max-width:540px){#lucid-wave-generator-v40 .mode-grid,#lucid-wave-generator-v40 .effect-grid,#lucid-wave-generator-v40 .enrich-grid{grid-template-columns:1fr}#lucid-wave-generator-v40 #stackToggleV40,#lucid-wave-generator-v40 #breathToggleV40,#lucid-wave-generator-v40 #shimmerToggleV40{grid-column:auto}#lucid-wave-generator-v40 .presets,#lucid-wave-generator-v40 .combo-grid{grid-template-columns:1fr}#lucid-wave-generator-v40 .wave-zone{top:132px;height:126px}#lucid-wave-generator-v40 #waveCanvasV40{height:126px}#lucid-wave-generator-v40 .orb-controls{top:226px;width:min(288px,90%)}#lucid-wave-generator-v40 .orb-slider-row{grid-template-columns:24px 1fr 28px;gap:3px}#lucid-wave-generator-v40 .orb-slider-row.is-volume{grid-template-columns:21px 1fr 26px;gap:3px}#lucid-wave-generator-v40 .planet-c{display:none}#lucid-wave-generator-v40 .planet-r{width:28px;height:28px;right:10%;top:4%}#lucid-wave-generator-v40 .planet-r::before{display:none}}
+  </style>
+</head>
+<body>
+  <div id="lucid-wave-generator-v40" data-lucid-wave-app="v40-standalone">
+    <div class="bg-stars" aria-hidden="true"></div>
+    <div class="bg-nebula" aria-hidden="true"></div>
+    <div class="bg-planet planet-a" aria-hidden="true"></div>
+    <div class="bg-planet planet-b" aria-hidden="true"></div>
+    <div class="bg-planet planet-c" aria-hidden="true"></div>
+    <div class="bg-planet planet-d" aria-hidden="true"></div>
+    <div class="bg-planet planet-e" aria-hidden="true"></div>
+    <div class="bg-planet planet-f" aria-hidden="true"></div>
+    <div class="bg-planet planet-g" aria-hidden="true"></div>
+    <div class="bg-planet planet-h" aria-hidden="true"></div>
+    <div class="bg-planet planet-j" aria-hidden="true"></div>
+    <div class="bg-planet planet-k" aria-hidden="true"></div>
+    <div class="bg-planet planet-l" aria-hidden="true"></div>
+    <div class="bg-planet planet-m" aria-hidden="true"></div>
+    <div class="bg-planet planet-n" aria-hidden="true"></div>
+    <div class="bg-planet planet-o" aria-hidden="true"></div>
+    <div class="bg-planet planet-p" aria-hidden="true"></div>
+    <div class="bg-planet planet-q" aria-hidden="true"></div>
+    <div class="bg-planet planet-r" aria-hidden="true"></div>
+    <div class="bg-planet planet-s" aria-hidden="true"></div>
+
+    <main class="page">
+      <section class="hero">
+        <h1>Waveform Generator</h1>
+        <p>Tune your space. Align your energy. Expand your awareness.</p>
+      </section>
+
+      <section class="globe-stage">
+        <div class="globe" id="planetOrbV40">
+          <div class="bass-rings" aria-hidden="true"><div class="bass-ring"></div><div class="bass-ring"></div><div class="bass-ring"></div></div>
+          <div class="globe-atmosphere" aria-hidden="true"></div>
+          <div class="globe-surface" aria-hidden="true"></div>
+          <div class="globe-terminator" aria-hidden="true"></div>
+          <div class="globe-rim" aria-hidden="true"></div>
+          <div class="globe-interior">
+            <div class="readout">
+              <div class="readout-label">Frequency (Hz)</div>
+              <div class="hz-number" id="hzValueV40">432</div>
+              <div class="preset-popup" id="presetPopupV40">Harmony</div>
+            </div>
+            <div class="wave-zone"><canvas id="waveCanvasV40" width="1920" height="250"></canvas></div>
+            <div class="orb-controls">
+              <label class="orb-slider-row"><span>Freq</span><input id="frequencySliderV40" type="range" min="1" max="20000" value="432" /><output><span id="underHzV40">432</span></output></label>
+              <label class="orb-slider-row is-volume"><span>Vol</span><input id="volumeV40" type="range" min="0" max="1" step="0.01" value="0.70" /><output id="volumeValueV40">70%</output></label>
+            </div>
+            <button class="play-button" id="playBtnV40" aria-label="Play tone"><span class="play-icon">▶</span></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="top-row">
+        <section class="panel compact-panel mode-panel">
+          <h2 class="panel-title">Mode</h2>
+          <div class="option-grid mode-grid">
+            <button class="option-btn active" id="binauralModeBtnV40"><span class="option-orb"><span>🎧</span></span><strong>Binaural</strong><p>Two ear tones create an inner beat.</p></button>
+            <button class="option-btn" id="singleModeBtnV40"><span class="option-orb"><span>〰</span></span><strong>Single</strong><p>One clean tone for any space.</p></button>
+          </div>
+        </section>
+
+        <section class="panel compact-panel waveform-panel">
+          <h2 class="panel-title">Waveform</h2>
+          <div class="option-grid wave-grid">
+            <button class="option-btn active wave-btn" data-wave="sine"><span class="option-orb"><svg viewBox="0 0 80 40"><path d="M3 20 C15 -2 25 -2 37 20 S59 42 77 20"></path></svg></span><strong>Sine</strong><p>Pure, smooth, meditation friendly tone.</p></button>
+            <button class="option-btn wave-btn" data-wave="square"><span class="option-orb"><svg viewBox="0 0 80 40"><path d="M4 28 L4 10 L20 10 L20 28 L36 28 L36 10 L52 10 L52 28 L76 28"></path></svg></span><strong>Square</strong><p>Strong digital pulse with more edge.</p></button>
+            <button class="option-btn wave-btn" data-wave="triangle"><span class="option-orb"><svg viewBox="0 0 80 40"><path d="M4 32 L24 8 L44 32 L58 16 L76 32"></path></svg></span><strong>Triangle</strong><p>Balanced tone with gentle harmonic color.</p></button>
+            <button class="option-btn wave-btn" data-wave="sawtooth"><span class="option-orb"><svg viewBox="0 0 80 40"><path d="M4 32 L28 8 L28 32 L54 8 L54 32 L76 20"></path></svg></span><strong>Saw</strong><p>Bright harmonic energy with more bite.</p></button>
+          </div>
+        </section>
+      </section>
+
+      <section class="middle-row">
+        <section class="panel compact-panel enrich-panel">
+          <h2 class="panel-title">Sound Enrichment</h2>
+          <div class="option-grid enrich-grid">
+            <button class="option-btn active" id="stackToggleV40"><span class="option-orb"><span>✺</span></span><strong>Lucid Stack</strong><p>Sub, air, and detuned layers.</p></button>
+            <button class="option-btn" id="breathToggleV40"><span class="option-orb"><span>〰</span></span><strong>Breath Motion</strong><p>Deep rolling body pulse.</p></button>
+            <button class="option-btn" id="shimmerToggleV40"><span class="option-orb"><span>⋇</span></span><strong>Shimmer</strong><p>Airy harmonic light.</p></button>
+          </div>
+        </section>
+
+        <section class="panel compact-panel effects-panel">
+          <h2 class="panel-title">Effects</h2>
+          <div class="option-grid effect-grid">
+            <div class="effect-control"><button class="effect-btn" id="reverbToggleV40"><span class="effect-orb"><span>◎</span></span><strong>Reverb</strong><small>Push the space even wider</small></button><label class="effect-slider"><span>Mix</span><input id="reverbAmountV40" type="range" min="0" max="2" step="0.01" value="0.90" /></label></div>
+            <div class="effect-control"><button class="effect-btn" id="bassFxToggleV40"><span class="effect-orb"><span>◉</span></span><strong>Bass</strong><small>Extra low body energy</small></button><label class="effect-slider"><span>Weight</span><input id="bassFxAmountV40" type="range" min="0" max="1" step="0.01" value="0.54" /></label></div>
+            <div class="effect-control"><button class="effect-btn" id="oscillationToggleV40"><span class="effect-orb"><span>≈</span></span><strong>Oscillation</strong><small>Stronger motion pulse</small></button><label class="effect-slider"><span>Depth</span><input id="oscillationAmountV40" type="range" min="0" max="1" step="0.01" value="0.42" /></label></div>
+          </div>
+        </section>
+      </section>
+
+      <section class="bottom-row">
+        <section class="panel compact-panel">
+          <h2 class="panel-title">Frequency Presets</h2>
+          <div class="presets" id="presetsV40"></div>
+        </section>
+
+        <section class="panel compact-panel">
+          <h2 class="panel-title">Lucid Combinations</h2>
+          <div class="combo-grid">
+            <button class="combo-card" data-combo="root"><span class="combo-orb"><span>♁</span></span><strong>Root Anchor</strong><p>174 + 348 + 396 Hz</p></button>
+            <button class="combo-card" data-combo="flow"><span class="combo-orb"><span>≈</span></span><strong>Sacral Flow</strong><p>174 + 285 + 417 Hz</p></button>
+            <button class="combo-card" data-combo="focus"><span class="combo-orb"><span>✦</span></span><strong>Focus Stack</strong><p>216 + 432 + 864 Hz</p></button>
+            <button class="combo-card" data-combo="heart"><span class="combo-orb"><span>♡</span></span><strong>Heart Field</strong><p>174 + 528 + 639 Hz</p></button>
+            <button class="combo-card" data-combo="clarity"><span class="combo-orb"><span>△</span></span><strong>Clear Voice</strong><p>216 + 639 + 741 Hz</p></button>
+            <button class="combo-card" data-combo="dream"><span class="combo-orb"><span>☾</span></span><strong>Dream Drift</strong><p>174 + 432 + 528 Hz</p></button>
+            <button class="combo-card" data-combo="crown"><span class="combo-orb"><span>✺</span></span><strong>Crown Light</strong><p>216 + 432 + 852 Hz</p></button>
+            <button class="combo-card" data-combo="calm"><span class="combo-orb"><span>◌</span></span><strong>Deep Calm</strong><p>174 + 285 + 432 Hz</p></button>
+            <button class="combo-card" data-combo="release"><span class="combo-orb"><span>⇢</span></span><strong>Emotional Reset</strong><p>174 + 396 + 417 Hz</p></button>
+            <button class="combo-card" data-combo="repair"><span class="combo-orb"><span>✹</span></span><strong>Repair Flow</strong><p>174 + 285 + 528 Hz</p></button>
+            <button class="combo-card" data-combo="voice"><span class="combo-orb"><span>☉</span></span><strong>Heart Voice</strong><p>216 + 528 + 639 Hz</p></button>
+            <button class="combo-card" data-combo="stillness"><span class="combo-orb"><span>✧</span></span><strong>Stillness Light</strong><p>216 + 432 + 963 Hz</p></button>
+          </div>
+        </section>
+      </section>
+
+      <section class="final-row">
+        <section class="panel compact-panel">
+          <h2 class="panel-title">How to Use</h2>
+          <div class="info-grid">
+            <div class="info-item"><span class="info-icon">〰</span><div><strong>Sound is vibration</strong><p>Use tones as supportive atmosphere.</p></div></div>
+            <div class="info-item"><span class="info-icon">🎧</span><div><strong>Binaural</strong><p>Headphones work best for split-ear listening.</p></div></div>
+            <div class="info-item"><span class="info-icon">◈</span><div><strong>Layered sound</strong><p>Sub, air, shimmer, and reverb build a fuller field.</p></div></div>
+            <div class="info-item"><span class="info-icon">♡</span><div><strong>Use intention</strong><p>Pair listening with breathwork, journaling, or stillness.</p></div></div>
+            <div class="info-item"><span class="info-icon">☼</span><div><strong>Begin gently</strong><p>Start low, then slowly increase volume over time.</p></div></div>
+            <div class="info-item"><span class="info-icon">✦</span><div><strong>Stay present</strong><p>Let attention rest on sensation, breath, and sound.</p></div></div>
+            <div class="info-item"><span class="info-icon">◌</span><div><strong>Layer with care</strong><p>More effects is not always better for focus or calm.</p></div></div>
+            <div class="info-item"><span class="info-icon">☾</span><div><strong>Rest well</strong><p>Dream and stillness blends are best kept soft and spacious.</p></div></div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const root = document.getElementById("lucid-wave-generator-v40");
+      if (!root) return;
+
+      const get = (id) => root.querySelector(`#${id}`);
+      const frequencySlider = get("frequencySliderV40");
+      const volume = get("volumeV40");
+      const volumeValue = get("volumeValueV40");
+      const hzValue = get("hzValueV40");
+      const underHz = get("underHzV40");
+      const presetPopup = get("presetPopupV40");
+      const playBtn = get("playBtnV40");
+      const canvas = get("waveCanvasV40");
+      const ctx = canvas.getContext("2d");
+      const presetsEl = get("presetsV40");
+      const singleModeBtn = get("singleModeBtnV40");
+      const binauralModeBtn = get("binauralModeBtnV40");
+      const reverbAmount = get("reverbAmountV40");
+      const bassFxAmount = get("bassFxAmountV40");
+      const oscillationAmount = get("oscillationAmountV40");
+
+      const waveButtons = [...root.querySelectorAll(".wave-btn")];
+      const effectButtons = [get("reverbToggleV40"), get("bassFxToggleV40"), get("oscillationToggleV40")];
+      const soundButtons = [get("stackToggleV40"), get("breathToggleV40"), get("shimmerToggleV40")];
+      const comboButtons = [...root.querySelectorAll(".combo-card")];
+
+      const presets = [
+        { hz: 174, label: "Grounding" },
+        { hz: 285, label: "Restoration" },
+        { hz: 396, label: "Release" },
+        { hz: 417, label: "Reset" },
+        { hz: 432, label: "Harmony" },
+        { hz: 528, label: "Love / Repair" },
+        { hz: 639, label: "Connection" },
+        { hz: 741, label: "Clarity" },
+        { hz: 852, label: "Intuition" },
+        { hz: 963, label: "Source" },
+        { hz: 1111, label: "Gratitude" },
+        { hz: 1212, label: "Manifest" }
+      ];
+
+      const comboDefs = {
+        root: { label: "Root Anchor", displayHz: 174, tones: [174, 348, 396], beat: 4, enrich: { breath: true }, fx: { reverb: true, bassFx: true }, sliders: { reverb: 0.72, bassFx: 0.62, oscillation: 0.18 } },
+        flow: { label: "Sacral Flow", displayHz: 174, tones: [174, 285, 417], beat: 5, enrich: { stack: true, breath: true, shimmer: true }, fx: { reverb: true, bassFx: true }, sliders: { reverb: 0.92, bassFx: 0.48, oscillation: 0.22 } },
+        focus: { label: "Focus Stack", displayHz: 216, tones: [216, 432, 864], beat: 7, enrich: { stack: true }, fx: { bassFx: true }, sliders: { reverb: 0.42, bassFx: 0.36, oscillation: 0.12 } },
+        heart: { label: "Heart Field", displayHz: 174, tones: [174, 528, 639], beat: 5, enrich: { stack: true, breath: true, shimmer: true }, fx: { reverb: true, bassFx: true }, sliders: { reverb: 1.08, bassFx: 0.52, oscillation: 0.24 } },
+        clarity: { label: "Clear Voice", displayHz: 216, tones: [216, 639, 741], beat: 6, enrich: { stack: true, shimmer: true }, fx: { reverb: true, oscillation: true }, sliders: { reverb: 0.86, bassFx: 0.20, oscillation: 0.44 } },
+        dream: { label: "Dream Drift", displayHz: 174, tones: [174, 432, 528], beat: 4, enrich: { stack: true, shimmer: true }, fx: { reverb: true }, sliders: { reverb: 1.26, bassFx: 0.24, oscillation: 0.18 } },
+        crown: { label: "Crown Light", displayHz: 216, tones: [216, 432, 852], beat: 4, enrich: { stack: true, shimmer: true }, fx: { reverb: true, bassFx: true }, sliders: { reverb: 1.18, bassFx: 0.34, oscillation: 0.16 } },
+        calm: { label: "Deep Calm", displayHz: 174, tones: [174, 285, 432], beat: 4, enrich: { breath: true }, fx: { reverb: true, bassFx: true }, sliders: { reverb: 0.96, bassFx: 0.44, oscillation: 0.14 } },
+        release: { label: "Emotional Reset", displayHz: 174, tones: [174, 396, 417], beat: 5, enrich: { stack: true, breath: true }, fx: { bassFx: true, oscillation: true }, sliders: { reverb: 0.36, bassFx: 0.56, oscillation: 0.56 } },
+        repair: { label: "Repair Flow", displayHz: 174, tones: [174, 285, 528], beat: 5, enrich: { stack: true, shimmer: true }, fx: { reverb: true }, sliders: { reverb: 0.98, bassFx: 0.22, oscillation: 0.18 } },
+        voice: { label: "Heart Voice", displayHz: 216, tones: [216, 528, 639], beat: 5, enrich: { stack: true, shimmer: true }, fx: { bassFx: true, reverb: true }, sliders: { reverb: 0.82, bassFx: 0.46, oscillation: 0.20 } },
+        stillness: { label: "Stillness Light", displayHz: 216, tones: [216, 432, 963], beat: 4, enrich: { stack: true, shimmer: true }, fx: { reverb: true, oscillation: true }, sliders: { reverb: 1.34, bassFx: 0.18, oscillation: 0.30 } }
+      };
+
+      let audioContext = null;
+      let isPlaying = false;
+      let isBinaural = true;
+      let currentWaveform = "sine";
+      let phase = 0;
+      let beat = 7;
+      let rafId = null;
+      let harmonyTones = [];
+      let currentComboLabel = "";
+      let currentDisplayHz = null;
+      let graph = null;
+
+      const enrich = { stack: true, breath: false, shimmer: false };
+      const fx = { reverb: false, bassFx: false, oscillation: false };
+
+      const currentDisplayValue = () => currentDisplayHz !== null ? `${currentDisplayHz}+` : hz();
+      const hz = () => Math.min(20000, Math.max(1, Math.round(Number(frequencySlider.value) || 432)));
+      const currentTones = () => harmonyTones.length ? harmonyTones : [hz()];
+
+      function ensureAudioContext() {
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        return audioContext;
+      }
+
+      function t() { return ensureAudioContext().currentTime; }
+
+      function clearPresetHighlights() {
+        root.querySelectorAll(".preset-card").forEach((card) => card.classList.remove("active"));
+      }
+
+      function clearComboHighlights() {
+        comboButtons.forEach((button) => button.classList.remove("active"));
+      }
+
+      function smoothParam(param, value, time = 0.08) {
+        const timeNow = t();
+        try {
+          param.cancelScheduledValues(timeNow);
+          param.setTargetAtTime(value, timeNow, time);
+        } catch (_) {
+          param.value = value;
+        }
+      }
+
+      function stopNode(node) {
+        if (!node) return;
+        try { if (node.stop) node.stop(); } catch (_) {}
+        try { if (node.disconnect) node.disconnect(); } catch (_) {}
+      }
+
+      function createImpulse(context, duration = 6, decay = 1.4) {
+        const safeDuration = Math.max(0.1, Number.isFinite(duration) ? duration : 6);
+        const safeDecay = Math.max(0.01, Number.isFinite(decay) ? decay : 1.4);
+        const sampleRate = context.sampleRate;
+        const length = Math.max(1, Math.floor(sampleRate * safeDuration));
+        const impulse = context.createBuffer(2, length, sampleRate);
+        for (let channel = 0; channel < impulse.numberOfChannels; channel += 1) {
+          const data = impulse.getChannelData(channel);
+          for (let i = 0; i < length; i += 1) {
+            const progress = i / length;
+            const envelope = Math.pow(1 - progress, safeDecay);
+            data[i] = (Math.random() * 2 - 1) * envelope * (channel === 0 ? 1 : 0.96);
+          }
+        }
+        return impulse;
+      }
+
+      function setOrbColor(value) {
+        const safeValue = Number.isFinite(Number(value)) ? Number(value) : 432;
+        root.style.setProperty("--orb-shift", `${Math.round((safeValue / 20000) * 155 - 42)}deg`);
+        root.style.setProperty("--orb-brightness", (1.08 + Math.min(safeValue / 20000, 0.55)).toFixed(2));
+      }
+
+      function updateBassPulse() {
+        if (!isPlaying) {
+          root.style.setProperty("--bass-pulse", "0");
+          return;
+        }
+        const bassMix = fx.bassFx ? Number(bassFxAmount.value) : 0.22;
+        const pulse = Math.max(0, Math.min(1, (Math.sin(phase * (0.36 + bassMix * 0.2)) * 0.5 + 0.5) * (0.18 + bassMix * 0.62)));
+        root.style.setProperty("--bass-pulse", pulse.toFixed(3));
+      }
+
+      function updateReadout() {
+        const display = currentDisplayValue();
+        hzValue.textContent = display;
+        underHz.textContent = display;
+        if (currentComboLabel) {
+          presetPopup.textContent = currentComboLabel;
+        } else {
+          const match = presets.find((item) => item.hz === hz());
+          presetPopup.textContent = match ? match.label : "Custom Frequency";
+        }
+      }
+
+      function syncToggles() {
+        soundButtons.forEach((button) => {
+          const key = button.id.replace("ToggleV40", "");
+          button.classList.toggle("active", !!enrich[key]);
+        });
+        effectButtons.forEach((button) => {
+          const key = button.id.replace("ToggleV40", "");
+          button.classList.toggle("active", !!fx[key]);
+        });
+        binauralModeBtn.classList.toggle("active", isBinaural);
+        singleModeBtn.classList.toggle("active", !isBinaural);
+      }
+
+      function resetTogglesAndSliders() {
+        enrich.stack = false;
+        enrich.breath = false;
+        enrich.shimmer = false;
+        fx.reverb = false;
+        fx.bassFx = false;
+        fx.oscillation = false;
+        reverbAmount.value = "0.90";
+        bassFxAmount.value = "0.54";
+        oscillationAmount.value = "0.42";
+      }
+
+      function stopGraph() {
+        if (!graph) return;
+        graph.oscillators.forEach(stopNode);
+        graph.nodes.forEach(stopNode);
+        graph = null;
+      }
+
+      function createOscillator(freq, type, gainAmount, destination, detune = 0, pan = null) {
+        const context = ensureAudioContext();
+        const osc = context.createOscillator();
+        const gain = context.createGain();
+        osc.type = type;
+        osc.frequency.value = Math.max(1, Math.min(20000, freq));
+        osc.detune.value = detune;
+        gain.gain.value = gainAmount;
+        if (pan !== null && context.createStereoPanner) {
+          const panner = context.createStereoPanner();
+          panner.pan.value = pan;
+          osc.connect(gain).connect(panner).connect(destination);
+          graph.nodes.push(panner);
+        } else {
+          osc.connect(gain).connect(destination);
+        }
+        osc.start();
+        graph.oscillators.push(osc, gain);
+      }
+
+      function buildGraph() {
+        const context = ensureAudioContext();
+        graph = { oscillators: [], nodes: [] };
+
+        const sourceBus = context.createGain();
+        const bassShelf = context.createBiquadFilter();
+        const lowWarmth = context.createBiquadFilter();
+        const tremolo = context.createGain();
+        const tremoloBase = context.createConstantSource();
+        const breathLfo = context.createOscillator();
+        const breathDepth = context.createGain();
+        const dryGain = context.createGain();
+        const reverbTone = context.createBiquadFilter();
+        const preDelay = context.createDelay(2.5);
+        const convolver = context.createConvolver();
+        const wetGain = context.createGain();
+        const master = context.createGain();
+        const shimmerBus = context.createGain();
+        const shimmerBandpass = context.createBiquadFilter();
+        const shimmerLowpass = context.createBiquadFilter();
+        const shimmerGain = context.createGain();
+        const bassFxBus = context.createGain();
+        const bassFxLowpass = context.createBiquadFilter();
+        const bassFxShape = context.createBiquadFilter();
+        const bassFxGain = context.createGain();
+
+        bassShelf.type = "lowshelf";
+        bassShelf.frequency.value = 64;
+        bassShelf.gain.value = 5.8;
+        lowWarmth.type = "lowpass";
+        lowWarmth.frequency.value = 168;
+        lowWarmth.Q.value = 0.16;
+        reverbTone.type = "highshelf";
+        reverbTone.frequency.value = 2400;
+        reverbTone.gain.value = 3.5;
+        convolver.normalize = true;
+        convolver.buffer = createImpulse(context, 7.5, 1.34);
+        tremolo.gain.value = 1;
+        tremoloBase.offset.value = 0.92;
+        breathLfo.frequency.value = 0.18;
+        breathDepth.gain.value = 0;
+        dryGain.gain.value = 1;
+        wetGain.gain.value = 0.52;
+        master.gain.value = Number(volume.value);
+        shimmerBandpass.type = "bandpass";
+        shimmerBandpass.frequency.value = 620;
+        shimmerBandpass.Q.value = 1.1;
+        shimmerLowpass.type = "lowpass";
+        shimmerLowpass.frequency.value = 940;
+        shimmerLowpass.Q.value = 0.6;
+        shimmerGain.gain.value = 0.28;
+        bassFxLowpass.type = "lowpass";
+        bassFxLowpass.frequency.value = 58;
+        bassFxLowpass.Q.value = 0.06;
+        bassFxShape.type = "lowpass";
+        bassFxShape.frequency.value = 96;
+        bassFxShape.Q.value = 0.1;
+        bassFxGain.gain.value = 0;
+
+        sourceBus.connect(bassShelf);
+        bassShelf.connect(lowWarmth);
+        lowWarmth.connect(tremolo);
+        tremolo.connect(dryGain).connect(master);
+        lowWarmth.connect(reverbTone).connect(preDelay).connect(convolver).connect(wetGain).connect(master);
+        shimmerBus.connect(shimmerBandpass).connect(shimmerLowpass).connect(shimmerGain).connect(sourceBus);
+        bassFxBus.connect(bassFxLowpass).connect(bassFxShape).connect(bassFxGain).connect(sourceBus);
+        tremoloBase.connect(tremolo.gain);
+        breathLfo.connect(breathDepth).connect(tremolo.gain);
+        master.connect(context.destination);
+
+        tremoloBase.start();
+        breathLfo.start();
+
+        graph.nodes.push(
+          sourceBus, bassShelf, lowWarmth, tremolo, tremoloBase, breathLfo, breathDepth, dryGain,
+          reverbTone, preDelay, convolver, wetGain, master, shimmerBus, shimmerBandpass,
+          shimmerLowpass, shimmerGain, bassFxBus, bassFxLowpass, bassFxShape, bassFxGain
+        );
+
+        graph.sourceBus = sourceBus;
+        graph.shimmerBus = shimmerBus;
+        graph.shimmerBandpass = shimmerBandpass;
+        graph.shimmerLowpass = shimmerLowpass;
+        graph.shimmerGain = shimmerGain;
+        graph.bassShelf = bassShelf;
+        graph.lowWarmth = lowWarmth;
+        graph.tremolo = tremolo;
+        graph.tremoloBase = tremoloBase;
+        graph.breathLfo = breathLfo;
+        graph.breathDepth = breathDepth;
+        graph.reverbTone = reverbTone;
+        graph.preDelay = preDelay;
+        graph.convolver = convolver;
+        graph.wetGain = wetGain;
+        graph.master = master;
+        graph.dryGain = dryGain;
+        graph.bassFxGain = bassFxGain;
+        graph.bassFxLowpass = bassFxLowpass;
+        graph.bassFxShape = bassFxShape;
+
+        const tones = currentTones();
+        const base = tones[0];
+
+        if (isBinaural) {
+          tones.forEach((tone, index) => {
+            const toneGain = index === 0 ? 0.18 : 0.09;
+            createOscillator(Math.max(1, tone - beat / 2), currentWaveform, toneGain, sourceBus, 0, -0.75);
+            createOscillator(Math.min(20000, tone + beat / 2), currentWaveform, toneGain, sourceBus, 0, 0.75);
+          });
+        } else {
+          tones.forEach((tone, index) => {
+            createOscillator(tone, currentWaveform, index === 0 ? 0.30 : 0.12, sourceBus);
+          });
+        }
+
+        if (enrich.stack) {
+          createOscillator(base * 2, currentWaveform, 0.08, sourceBus, -7, isBinaural ? -0.22 : null);
+          createOscillator(base * 2, currentWaveform, 0.08, sourceBus, 7, isBinaural ? 0.22 : null);
+        }
+
+        createOscillator(Math.max(24, base / 5.2), "sine", isBinaural ? 0.07 : 0.11, sourceBus, 0, isBinaural ? -0.1 : null);
+        createOscillator(Math.max(24, base / 5.2), "sine", isBinaural ? 0.07 : 0.11, sourceBus, 0, isBinaural ? 0.1 : null);
+
+        if (fx.bassFx) {
+          createOscillator(Math.max(30, base / 9.8), "sine", isBinaural ? 0.56 : 0.72, bassFxBus, 0, isBinaural ? -0.03 : null);
+          createOscillator(Math.max(30, base / 9.8), "sine", isBinaural ? 0.56 : 0.72, bassFxBus, 0, isBinaural ? 0.03 : null);
+          createOscillator(Math.max(38, base / 12.8), "sine", isBinaural ? 0.26 : 0.36, bassFxBus);
+          createOscillator(Math.max(46, base / 15.5), "sine", isBinaural ? 0.14 : 0.22, bassFxBus);
+        }
+
+        if (enrich.shimmer) {
+          tones.slice(0, 3).forEach((tone) => createOscillator(Math.max(220, tone * 0.94), "triangle", 0.09, shimmerBus, -4));
+          tones.slice(0, 3).forEach((tone) => createOscillator(Math.max(250, tone * 1.06), "sine", 0.07, shimmerBus, 4));
+          createOscillator(Math.max(320, base * 1.18), "triangle", 0.05, shimmerBus);
+        }
+
+        applyLiveSettings();
+      }
+
+      function applyLiveSettings() {
+        if (!graph) return;
+        const reverbMix = Math.max(0, Math.min(2, Number(reverbAmount.value)));
+        const bassMix = Math.max(0, Math.min(1, Number(bassFxAmount.value)));
+        const oscillationMix = fx.oscillation ? Math.max(0, Math.min(1, Number(oscillationAmount.value))) : 0;
+        const extraReverb = fx.reverb ? Math.pow(reverbMix / 2, 1.2) : 0;
+        const breathDepthBase = enrich.breath ? 2.75 : 0;
+        const breathRateBase = enrich.breath ? 0.58 : 0.10;
+        const oscillationDepth = oscillationMix * 1.18;
+        const oscillationRate = 0.32 + oscillationMix * 2.4;
+
+        smoothParam(graph.master.gain, Number(volume.value), 0.03);
+        smoothParam(graph.dryGain.gain, 1 - extraReverb * 0.52, 0.10);
+        smoothParam(graph.bassShelf.gain, fx.bassFx ? 7.2 : 5.8, 0.10);
+        smoothParam(graph.lowWarmth.frequency, fx.bassFx ? 150 : 168, 0.10);
+        smoothParam(graph.tremoloBase.offset, 0.92 - oscillationMix * 0.42 - (enrich.breath ? 0.34 : 0), 0.12);
+        smoothParam(graph.breathDepth.gain, breathDepthBase + oscillationDepth, 0.12);
+        smoothParam(graph.breathLfo.frequency, oscillationMix > 0 ? oscillationRate : breathRateBase, 0.12);
+        smoothParam(graph.preDelay.delayTime, 0.04 + reverbMix * 0.32, 0.10);
+        smoothParam(graph.wetGain.gain, fx.reverb ? 0.45 + reverbMix * 5.8 : 0.0001, 0.12);
+        smoothParam(graph.reverbTone.gain, fx.reverb ? 3.5 + reverbMix * 6.8 : 0, 0.12);
+        smoothParam(graph.shimmerGain.gain, enrich.shimmer ? 0.4 : 0, 0.10);
+        smoothParam(graph.shimmerBandpass.frequency, 600, 0.10);
+        smoothParam(graph.shimmerLowpass.frequency, 900, 0.10);
+        smoothParam(graph.bassFxGain.gain, fx.bassFx ? 0.22 + Math.pow(bassMix, 1.3) * 1.38 : 0, 0.12);
+        smoothParam(graph.bassFxLowpass.frequency, 52 + bassMix * 12, 0.12);
+        smoothParam(graph.bassFxShape.frequency, 88 + bassMix * 18, 0.12);
+        graph.convolver.normalize = true;
+        graph.convolver.buffer = createImpulse(ensureAudioContext(), 7.5 + reverbMix * 18, 1.34 - Math.min(reverbMix * 0.14, 0.42));
+      }
+
+      async function startTone() {
+        ensureAudioContext();
+        if (audioContext.state !== "running") await audioContext.resume();
+        stopGraph();
+        buildGraph();
+        isPlaying = true;
+        setOrbColor(currentDisplayHz || hz());
+        playBtn.innerHTML = '<span><svg class="pause-icon-svg" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="2.5" width="4" height="13"></rect><rect x="11" y="2.5" width="4" height="13"></rect></svg></span>';
+      }
+
+      function stopTone() {
+        stopGraph();
+        isPlaying = false;
+        root.style.setProperty("--bass-pulse", "0");
+        setOrbColor(currentDisplayHz || hz());
+        playBtn.innerHTML = '<span class="play-icon">▶</span>';
+      }
+
+      function rebuildAudioGraph() {
+        if (!isPlaying) return;
+        stopGraph();
+        buildGraph();
+      }
+
+      function updateFrequency(value) {
+        frequencySlider.value = value;
+        currentComboLabel = "";
+        currentDisplayHz = null;
+        harmonyTones = [];
+        clearComboHighlights();
+        clearPresetHighlights();
+        resetTogglesAndSliders();
+        const valueHz = hz();
+        root.querySelector(`.preset-card[data-hz="${valueHz}"]`)?.classList.add("active");
+        setOrbColor(valueHz);
+        updateReadout();
+        syncToggles();
+        if (isPlaying) rebuildAudioGraph();
+      }
+
+      function setMode(useBinaural) {
+        isBinaural = useBinaural;
+        syncToggles();
+        rebuildAudioGraph();
+      }
+
+      function setWave(wave) {
+        currentWaveform = wave;
+        waveButtons.forEach((button) => button.classList.toggle("active", button.dataset.wave === wave));
+        rebuildAudioGraph();
+      }
+
+      function activateCombo(type) {
+        const config = comboDefs[type];
+        if (!config) return;
+        clearPresetHighlights();
+        clearComboHighlights();
+        root.querySelector(`.combo-card[data-combo="${type}"]`)?.classList.add("active");
+        harmonyTones = [...config.tones];
+        beat = config.beat;
+        currentComboLabel = config.label;
+        currentDisplayHz = config.displayHz;
+        isBinaural = true;
+        enrich.stack = false;
+        enrich.breath = false;
+        enrich.shimmer = false;
+        fx.reverb = false;
+        fx.bassFx = false;
+        fx.oscillation = false;
+        Object.assign(enrich, config.enrich || {});
+        Object.assign(fx, config.fx || {});
+        reverbAmount.value = String(config.sliders?.reverb ?? 0.90);
+        bassFxAmount.value = String(config.sliders?.bassFx ?? 0.54);
+        oscillationAmount.value = String(config.sliders?.oscillation ?? 0.42);
+        frequencySlider.value = config.displayHz;
+        setOrbColor(config.displayHz);
+        updateReadout();
+        syncToggles();
+        if (!isPlaying) startTone();
+        else rebuildAudioGraph();
+      }
+
+      function renderPresets() {
+        presetsEl.innerHTML = presets.map((item) => `
+          <button class="preset-card ${item.hz === 432 ? "active" : ""}" data-hz="${item.hz}">
+            <div class="preset-planet">${item.hz}<br>Hz</div>
+            <strong>${item.label}</strong>
+            <p>${item.hz} Hz</p>
+          </button>
+        `).join("");
+
+        root.querySelectorAll(".preset-card").forEach((card) => {
+          card.addEventListener("click", async () => {
+            updateFrequency(card.dataset.hz);
+            if (!isPlaying) await startTone();
+          });
+        });
+      }
+
+      function resizeCanvas() {
+        canvas.width = Math.max(1200, Math.floor(window.innerWidth * 2));
+        canvas.height = 250;
+      }
+
+      function drawWaveLayer({ width, height, amplitude, density, lineWidth, alpha, strokeStyle, waveform, layerOffset }) {
+        const centerY = height / 2;
+        ctx.beginPath();
+        ctx.lineWidth = lineWidth;
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = strokeStyle;
+        for (let x = 0; x <= width; x += 3) {
+          const timeValue = (x / width) * Math.PI * density + phase + layerOffset;
+          let y = centerY + Math.sin(timeValue) * amplitude;
+          if (waveform === "square") y = centerY + (Math.sin(timeValue) >= 0 ? amplitude * 0.58 : -amplitude * 0.58);
+          if (waveform === "triangle") y = centerY + (2 / Math.PI) * Math.asin(Math.sin(timeValue)) * amplitude;
+          if (waveform === "sawtooth") y = centerY + (2 * (timeValue / (2 * Math.PI) - Math.floor(0.5 + timeValue / (2 * Math.PI)))) * amplitude;
+          y += Math.sin((x / width) * Math.PI * 6 + phase * 0.8 + layerOffset) * 8;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      function draw() {
+        const w = canvas.width;
+        const h = canvas.height;
+        const value = currentDisplayHz || hz();
+        const amp = isPlaying ? 56 + Number(volume.value) * 42 : 30;
+        const speed = isPlaying ? 0.07 + Math.min(value / 20000, 0.22) : 0.018;
+        const density = Math.min(30, Math.max(3, value / 72));
+        ctx.clearRect(0, 0, w, h);
+        const grad = ctx.createLinearGradient(0, 0, w, 0);
+        grad.addColorStop(0, "rgba(255,80,226,0)");
+        grad.addColorStop(0.18, "rgba(255,80,226,.92)");
+        grad.addColorStop(0.5, "rgba(255,255,255,.94)");
+        grad.addColorStop(0.82, "rgba(54,190,255,.92)");
+        grad.addColorStop(1, "rgba(54,190,255,0)");
+        for (let layer = 0; layer < 10; layer += 1) {
+          drawWaveLayer({ width: w, height: h, amplitude: amp, density, lineWidth: layer === 0 ? 5.2 : 1.2, alpha: layer === 0 ? 1 : 0.15, strokeStyle: grad, waveform: currentWaveform, layerOffset: layer * 0.38 });
+        }
+        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgba(255,255,255,.66)";
+        const centerY = h / 2;
+        for (let x = 0; x <= w; x += 5) {
+          const y = centerY + Math.cos((x / w) * Math.PI * (density * 0.5) + phase * 1.2) * (amp * 0.26);
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        if (isPlaying) phase += speed;
+        updateBassPulse();
+        rafId = requestAnimationFrame(draw);
+      }
+
+      playBtn.addEventListener("click", async () => {
+        playBtn.disabled = true;
+        try {
+          if (isPlaying) stopTone();
+          else await startTone();
+        } finally {
+          playBtn.disabled = false;
+        }
+      });
+      binauralModeBtn.addEventListener("click", () => setMode(true));
+      singleModeBtn.addEventListener("click", () => setMode(false));
+      frequencySlider.addEventListener("input", (event) => updateFrequency(event.target.value));
+      volume.addEventListener("input", () => {
+        volumeValue.textContent = `${Math.round(Number(volume.value) * 100)}%`;
+        applyLiveSettings();
+      });
+      waveButtons.forEach((button) => button.addEventListener("click", () => setWave(button.dataset.wave)));
+      soundButtons.forEach((button) => button.addEventListener("click", () => {
+        const key = button.id.replace("ToggleV40", "");
+        enrich[key] = !enrich[key];
+        button.classList.toggle("active", enrich[key]);
+        rebuildAudioGraph();
+      }));
+      effectButtons.forEach((button) => button.addEventListener("click", () => {
+        const key = button.id.replace("ToggleV40", "");
+        fx[key] = !fx[key];
+        button.classList.toggle("active", fx[key]);
+        rebuildAudioGraph();
+      }));
+      reverbAmount.addEventListener("input", applyLiveSettings);
+      bassFxAmount.addEventListener("input", applyLiveSettings);
+      oscillationAmount.addEventListener("input", applyLiveSettings);
+      comboButtons.forEach((button) => button.addEventListener("click", () => activateCombo(button.dataset.combo)));
+      window.addEventListener("resize", resizeCanvas);
+
+      resizeCanvas();
+      renderPresets();
+      updateFrequency(432);
+      volumeValue.textContent = `${Math.round(Number(volume.value) * 100)}%`;
+      draw();
+    })();
+  </script>
+</body>
+</html>
