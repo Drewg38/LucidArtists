@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cosmic Oracle Library Preview</title>
+<style>
+:root{
+  --gold:#f6c96f;
+  --gold-soft:#ffe8b7;
+  --rose:#ff7adf;
+  --cyan:#65ecff;
+  --violet:#8b5cff;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  overflow-x:hidden;
+  color:white;
+  font-family:Georgia,'Times New Roman',serif;
+  background:
+    radial-gradient(circle at 12% 17%, rgba(139,92,255,.34), transparent 22%),
+    radial-gradient(circle at 86% 18%, rgba(101,236,255,.16), transparent 20%),
+    radial-gradient(circle at 52% 92%, rgba(255,122,223,.12), transparent 28%),
+    linear-gradient(180deg,#01020a 0%,#080818 54%,#01020a 100%);
+}
+button{font:inherit}
+.scene{
+  width:min(1040px,95vw);
+  min-height:790px;
+  position:relative;
+  display:grid;
+  place-items:center;
+  padding:58px 18px 44px;
+  isolation:isolate;
+}
+.stars,.stars:before,.stars:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(circle,#fff 0 1px,transparent 1.7px),
+    radial-gradient(circle,var(--gold-soft) 0 1px,transparent 1.8px),
+    radial-gradient(circle,var(--cyan) 0 1px,transparent 1.6px);
+  background-size:118px 144px,176px 162px,242px 206px;
+  background-position:12px 24px,82px 56px,34px 122px;
+  opacity:.62;
+  z-index:-5;
+}
+.stars:before{opacity:.25;filter:blur(.8px);transform:scale(1.05)}
+.stars:after{opacity:.15;filter:blur(1.2px);transform:scale(1.12)}
+.planet{
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:-4;
+  opacity:.88;
+  filter:drop-shadow(0 0 26px rgba(139,92,255,.34));
+}
+.planet:before{
+  content:"";
+  position:absolute;
+  left:-28%;
+  top:43%;
+  width:156%;
+  height:18%;
+  border:2px solid rgba(246,201,111,.48);
+  border-left-color:transparent;
+  border-right-color:transparent;
+  border-radius:50%;
+  transform:rotate(-14deg);
+}
+.planet.one{
+  width:112px;height:112px;left:4%;top:14%;
+  background:radial-gradient(circle at 30% 24%,rgba(255,255,255,.28),transparent 16%),linear-gradient(135deg,#2d1265,#823cff 45%,#ff7adf);
+}
+.planet.two{
+  width:82px;height:82px;right:6%;top:16%;
+  background:radial-gradient(circle at 30% 24%,rgba(255,255,255,.26),transparent 16%),linear-gradient(135deg,#0d204d,#436dff 45%,#65ecff);
+}
+.planet.three{
+  width:48px;height:48px;right:18%;top:8%;opacity:.5;
+  background:linear-gradient(135deg,#20103f,#65ecff 52%,#fff1b8);
+}
+.planet.three:before{display:none}
+.bookshelf{
+  width:min(720px,90vw);
+  position:relative;
+  padding:30px 34px 34px;
+  border-radius:36px;
+  background:
+    radial-gradient(circle at 50% -8%, rgba(246,201,111,.22), transparent 24%),
+    radial-gradient(circle at 50% 8%, rgba(188,77,255,.16), transparent 36%),
+    linear-gradient(90deg,rgba(255,255,255,.055),transparent 16% 84%,rgba(255,255,255,.055)),
+    linear-gradient(180deg,rgba(22,18,45,.92),rgba(4,5,14,.98));
+  border:1px solid rgba(246,201,111,.55);
+  box-shadow:0 34px 92px rgba(0,0,0,.68),0 0 72px rgba(139,92,255,.22),inset 0 0 44px rgba(246,201,111,.075);
+}
+.bookshelf:before,.bookshelf:after{
+  content:"";
+  position:absolute;
+  top:32px;bottom:32px;width:22px;
+  border-radius:999px;
+  background:linear-gradient(90deg,#05040b,#30244d 48%,#070612);
+  border:1px solid rgba(246,201,111,.62);
+  box-shadow:inset 0 0 18px rgba(246,201,111,.17),0 0 18px rgba(188,77,255,.22);
+}
+.bookshelf:before{left:12px}.bookshelf:after{right:12px}
+.arch{
+  position:absolute;left:50%;top:-24px;width:min(520px,74vw);height:260px;
+  transform:translateX(-50%);
+  border:2px solid rgba(246,201,111,.26);
+  border-bottom:0;border-radius:500px 500px 0 0;
+  pointer-events:none;
+}
+.crest{
+  position:absolute;left:50%;top:-64px;width:260px;height:146px;
+  transform:translateX(-50%);pointer-events:none;z-index:3;
+}
+.crest:before{
+  content:"";position:absolute;left:50%;top:0;width:84px;height:84px;
+  transform:translateX(-50%);border-radius:50%;
+  background:radial-gradient(circle at 64% 42%,#02030a 0 29px,transparent 30px),radial-gradient(circle at 44% 42%,#fff1c7 0 38px,#f6c96f 41px,transparent 43px);
+  filter:drop-shadow(0 0 20px rgba(246,201,111,.72));
+}
+.crest:after{
+  content:"";position:absolute;left:50%;bottom:12px;width:230px;height:58px;
+  transform:translateX(-50%);
+  border-top:2px solid rgba(246,201,111,.76);
+  border-radius:50% 50% 0 0;
+  box-shadow:0 -8px 20px rgba(188,77,255,.12),inset 0 11px 0 -10px rgba(246,201,111,.7);
+}
+.shelf-detail{
+  position:absolute;inset:18px 48px auto;height:54px;
+  pointer-events:none;border-top:1px solid rgba(246,201,111,.38);
+  border-radius:50% 50% 0 0;
+}
+.title{
+  position:relative;z-index:4;margin:10px 0 22px;text-align:center;
+  font-family:Arial,sans-serif;font-size:clamp(25px,3.7vw,43px);
+  font-weight:900;letter-spacing:.17em;text-transform:uppercase;
+  color:transparent;
+  background:linear-gradient(90deg,#ffe8b7 0%,#ff8de4 42%,#65ecff 78%,#ffe8b7 100%);
+  -webkit-background-clip:text;background-clip:text;
+}
+.shelf-row{
+  position:relative;z-index:4;display:grid;grid-template-columns:repeat(4,1fr);
+  gap:19px;padding:22px 26px 31px;
+  border-bottom:9px solid rgba(5,5,13,.98);
+  box-shadow:0 12px 0 rgba(246,201,111,.12),inset 0 -1px rgba(246,201,111,.52);
+}
+.shelf-row:after{
+  content:"";position:absolute;left:20px;right:20px;bottom:8px;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(246,201,111,.48),transparent);
+}
+.shelf-row:last-child{border-bottom:0;box-shadow:inset 0 -1px rgba(246,201,111,.35)}
+.deck{
+  position:relative;display:block;width:100%;aspect-ratio:2/3.05;
+  border:0;padding:0;color:inherit;background:transparent;cursor:pointer;
+  perspective:900px;transform:rotateY(var(--tilt));
+  transition:transform .28s ease,filter .28s ease;
+}
+.deck:hover{transform:rotateY(var(--tilt)) translateY(-7px) scale(1.025);filter:drop-shadow(0 0 20px var(--accent))}
+.deck-inner{position:relative;display:block;width:100%;height:100%;border-radius:13px}
+.deck-inner:after{
+  content:"";position:absolute;top:7px;right:-9px;width:13px;height:calc(100% - 14px);
+  border-radius:0 10px 10px 0;
+  background:linear-gradient(90deg,rgba(255,255,255,.1),rgba(0,0,0,.62)),linear-gradient(180deg,var(--accent),#070814 72%);
+  border:1px solid rgba(246,201,111,.35);transform:skewY(-6deg);opacity:.82;z-index:-1;
+}
+.deck-face{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  text-align:center;padding:13px 9px;overflow:hidden;border-radius:13px;
+  border:1px solid rgba(255,226,164,.64);
+  background:linear-gradient(90deg,rgba(255,255,255,.13),transparent 14% 86%,rgba(0,0,0,.42)),
+    radial-gradient(circle at 50% 32%, var(--accent), transparent 31%),
+    linear-gradient(160deg,#0b0d1e 0%,#17102d 56%,#05050e 100%);
+  box-shadow:9px 11px 0 rgba(0,0,0,.38),0 0 20px rgba(188,77,255,.18),inset 0 0 0 2px rgba(255,255,255,.035);
+}
+.deck-face:before{
+  content:"";position:absolute;inset:7px;border-radius:9px;
+  border:1px solid rgba(246,201,111,.58);pointer-events:none;
+}
+.deck-face:after{
+  content:"";position:absolute;inset:-48% -24%;
+  background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.17),transparent 52%);
+  transform:translateX(-38%) rotate(10deg);opacity:.42;
+}
+.cover-symbol{
+  width:52px;height:52px;margin-top:10px;position:relative;z-index:2;border-radius:50%;
+  display:grid;place-items:center;font-size:29px;color:var(--gold-soft);
+  background:radial-gradient(circle,rgba(255,255,255,.2),transparent 30%),radial-gradient(circle,var(--accent),transparent 60%);
+  box-shadow:0 0 22px var(--accent),inset 0 0 22px rgba(255,255,255,.1);
+}
+.deck h3{
+  position:relative;z-index:2;margin:7px 0 4px;color:#fff2c5;
+  font-size:14px;line-height:1.03;letter-spacing:.07em;text-transform:uppercase;
+}
+.deck p{
+  position:relative;z-index:2;margin:0 0 7px;color:rgba(255,255,255,.66);
+  font-family:Arial,sans-serif;font-size:9px;letter-spacing:.17em;text-transform:uppercase;
+}
+.mini-ornament{
+  width:42px;height:7px;position:relative;z-index:2;border-radius:999px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.overlay{
+  position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:22px;
+  background:rgba(0,0,0,.72);backdrop-filter:blur(10px);
+  opacity:0;pointer-events:none;transition:opacity .25s ease;
+}
+.overlay.is-open{opacity:1;pointer-events:auto}
+.modal-wrap{display:grid;gap:14px;justify-items:center;--activeAccent:#8b5cff}
+.large-deck{
+  width:min(310px,82vw);aspect-ratio:2/3.05;position:relative;
+  transform:scale(.88) translateY(18px) rotateY(-7deg);
+  transform-style:preserve-3d;transition:transform .32s cubic-bezier(.2,.8,.2,1);
+}
+.overlay.is-open .large-deck{transform:scale(1) translateY(0) rotateY(-7deg)}
+.modal-wrap.is-back .large-deck{animation:flipPulse .42s ease both}
+@keyframes flipPulse{
+  0%{transform:scale(1) rotateY(-7deg)}
+  50%{transform:scale(1.02) rotateY(78deg)}
+  100%{transform:scale(1) rotateY(-7deg)}
+}
+.large-deck:after{
+  content:"";position:absolute;top:14px;right:-22px;width:28px;height:calc(100% - 28px);
+  border-radius:0 20px 20px 0;
+  background:linear-gradient(90deg,rgba(255,255,255,.13),rgba(0,0,0,.68)),linear-gradient(180deg,var(--activeAccent),#070814 72%);
+  border:1px solid rgba(246,201,111,.38);transform:skewY(-6deg);opacity:.88;z-index:-1;
+}
+.large-card{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  gap:16px;text-align:center;padding:32px 26px 28px;border-radius:24px;
+  border:1px solid rgba(246,201,111,.72);overflow:hidden;
+  background:linear-gradient(90deg,rgba(255,255,255,.14),transparent 15% 86%,rgba(0,0,0,.44)),
+    radial-gradient(circle at 50% 28%, var(--activeAccent), transparent 31%),
+    linear-gradient(160deg,#080915,#18102c 58%,#03040b);
+  box-shadow:0 34px 100px rgba(0,0,0,.74),0 0 52px rgba(139,92,255,.4),inset 0 0 0 2px rgba(255,255,255,.035);
+}
+.large-card:before{
+  content:"";position:absolute;inset:15px;border:1px solid rgba(246,201,111,.58);
+  border-radius:18px;pointer-events:none;
+}
+.large-card.back-mode{justify-content:center}
+.large-symbol{
+  width:112px;height:112px;position:relative;z-index:2;border-radius:50%;
+  display:grid;place-items:center;font-size:62px;color:var(--gold-soft);
+  background:radial-gradient(circle,rgba(255,255,255,.2),transparent 30%),radial-gradient(circle,var(--activeAccent),transparent 60%);
+  box-shadow:0 0 32px var(--activeAccent),inset 0 0 28px rgba(255,255,255,.1);
+}
+.large-title{
+  position:relative;z-index:2;margin:0;color:#fff2c5;
+  font-size:34px;line-height:.98;letter-spacing:.08em;text-transform:uppercase;
+}
+.large-kicker{
+  position:relative;z-index:2;color:rgba(255,255,255,.64);
+  font-family:Arial,sans-serif;font-size:12px;letter-spacing:.18em;text-transform:uppercase;margin-top:10px;
+}
+.large-copy{
+  position:relative;z-index:2;max-width:238px;margin:0;color:rgba(255,255,255,.86);
+  font-family:Arial,sans-serif;font-size:15px;line-height:1.65;
+}
+.modal-actions{
+  display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;width:min(430px,90vw);
+}
+.select-link,.flip-btn{
+  min-height:42px;border-radius:999px;padding:10px 20px;
+  font-family:Arial,sans-serif;font-size:12px;font-weight:900;letter-spacing:.12em;
+  text-transform:uppercase;text-decoration:none;cursor:pointer;
+}
+.select-link{
+  color:#130915;border:1px solid rgba(246,201,111,.7);
+  background:linear-gradient(135deg,var(--gold-soft),var(--gold));
+  box-shadow:0 0 22px rgba(246,201,111,.24);
+}
+.flip-btn{color:white;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08)}
+.x-close{
+  position:absolute;top:16px;right:16px;z-index:5;width:34px;height:34px;
+  display:grid;place-items:center;border-radius:50%;
+  border:1px solid rgba(246,201,111,.62);color:#ffe8b7;background:rgba(5,5,14,.72);
+  box-shadow:0 0 18px rgba(246,201,111,.18);cursor:pointer;
+  font-family:Arial,sans-serif;font-weight:900;line-height:1;
+}
+.crystals{position:absolute;inset:auto 0 0;height:122px;pointer-events:none;z-index:6}
+.crystal{
+  position:absolute;bottom:0;width:36px;height:92px;
+  clip-path:polygon(50% 0,88% 34%,78% 100%,20% 100%,10% 34%);
+  background:linear-gradient(135deg,rgba(255,255,255,.72),var(--cyan),var(--violet) 72%,#25072e);
+  opacity:.9;filter:drop-shadow(0 0 16px rgba(139,92,255,.75));
+}
+.crystal.one{left:18px;transform:rotate(-10deg) scale(.9)}
+.crystal.two{left:58px;height:68px;transform:rotate(12deg)}
+.crystal.three{right:24px;transform:rotate(12deg) scale(.96)}
+.crystal.four{right:74px;height:66px;transform:rotate(-8deg)}
+@media (max-width:820px){
+  .scene{min-height:auto;padding:64px 12px 34px}
+  .bookshelf{padding:28px 22px 34px;border-radius:28px;width:min(680px,92vw)}
+  .shelf-row{grid-template-columns:repeat(2,1fr);gap:18px;padding:22px 26px 30px}
+  .title{letter-spacing:.12em}
+}
+</style>
+</head>
+<body>
+<main class="scene" aria-label="Cosmic oracle bookshelf">
+  <div class="stars"></div>
+  <div class="planet one"></div><div class="planet two"></div><div class="planet three"></div>
+  <section class="bookshelf">
+    <div class="arch"></div><div class="crest"></div><div class="shelf-detail"></div>
+    <h1 class="title">Oracle Library</h1>
+    <div class="shelf-row">
+      <button class="deck" style="--accent:#8b5cff;--tilt:-4deg" data-title="Lunar Dreams" data-symbol="☾" data-accent="#8b5cff" data-copy="Moonlit guidance for intuition, rest, memory, and emotional clarity." data-link="/lunar-dreams"><span class="deck-inner"><span class="deck-face"><span class="cover-symbol">☾</span><h3>Lunar<br>Dreams</h3><p>Tarot</p><span class="mini-ornament"></span></span></span></button>
+      <button class="deck" style="--accent:#56e6ff;--tilt:2deg" data-title="Star Seed" data-symbol="✦" data-accent="#56e6ff" data-copy="A bright deck for creative sparks, purpose, and cosmic direction." data-link="/star-seed"><span class="deck-inner"><span class="deck-face"><span class="cover-symbol">✦</span><h3>Star<br>Seed</h3><p>Tarot</p><span class="mini-ornament"></span></span></span></button>
+      <button class="deck" style="--accent:#ff4fd8;--tilt:-2deg" data-title="Cosmic Oracle" data-symbol="◉" data-accent="#ff4fd8" data-copy="Messages from the unknown, designed for pattern finding and wonder." data-link="/cosmic-oracle"><span class="deck-inner"><span class="deck-face"><span class="cover-symbol">◉</span><h3>Cosmic<br>Oracle</h3><p>Tarot</p><span class="mini-ornament"></span></span></span></button>
+      <button class="deck" style="--accent:#f6c96f;--tilt:3deg" data-title="Solar Flare" data-symbol="☀" data-accent="#f6c96f" data-copy="A radiant deck for courage, visibility, vitality, and inspired action." data-link="/solar-flare"><span class="deck-inner"><span class="deck-face"><span class="cover-symbol">☀</span><h3>Solar<br>Flare</h3><p>Tarot</p><span class="mini-ornament"></span></span></span></button>
+    </div>
+    <div class="shelf-row">
+      <button class="deck" style="--accent:#7a4dff;--tilt:-3deg" data-title="Infinite Soul" data-symbol="∞" data-accent="#7a4dff" data-copy="A contemplative deck for cycles, soul lessons, and deep perspective." data-link="/infinite-soul"><span class="deck-inner"><span class="deck-face"><span class="cover-symbol">∞</span><h3>Infinite<br>Soul</h3><p>Tarot</p><span class="mini-ornament"></span></span></span></button>
+      <button class="deck" style="--accent:#ff6aab;--tilt:3deg" data-title="Venusian Love" data-symbol="♡" data-accent="#ff6aab" data-copy="Soft guidance for love, boundaries, attraction, and connection." data-link="/venusian-love"><span class="deck-inner"><span class="deck-face"><span class="cover-symbol">♡</span><h3>Venusian<br>Love</h3><p>Tarot</p><span class="mini-ornament"></span></span></span></button>
+      <button class="deck" style="--accent:#00d8b8;--tilt:-3deg" data-title="Mystic Realms" data-symbol="♆" data-accent="#00d8b8" data-copy="A portal deck for dream worlds, symbols, and spiritual exploration." data-link="/mystic-realms"><span class="deck-inner"><span class="deck-face"><span class="cover-symbol">♆</span><h3>Mystic<br>Realms</h3><p>Tarot</p><span class="mini-ornament"></span></span></span></button>
+      <button class="deck" style="--accent:#4567ff;--tilt:1deg" data-title="Galaxy Guides" data-symbol="◌" data-accent="#4567ff" data-copy="A navigational deck for decisions, timing, and inner guidance." data-link="/galaxy-guides"><span class="deck-inner"><span class="deck-face"><span class="cover-symbol">◌</span><h3>Galaxy<br>Guides</h3><p>Tarot</p><span class="mini-ornament"></span></span></span></button>
+    </div>
+    <div class="shelf-row">
+      <button class="deck" style="--accent:#fd9d3f;--tilt:-1deg" data-title="Ancient Wisdom" data-symbol="♢" data-accent="#fd9d3f" data-copy="Grounded messages for roots, lineage, patience, and old knowledge." data-link="/ancient-wisdom"><span class="deck-inner"><span class="deck-face"><span class="cover-symbol">♢</span><h3>Ancient<br>Wisdom</h3><p>Tarot</p><span class="mini-ornament"></span></span></span></button>
+      <button class="deck" style="--accent:#735cff;--tilt:4deg" data-title="Shadow Path" data-symbol="◐" data-accent="#735cff" data-copy="A protective deck for shadow work, honesty, and transformation." data-link="/shadow-path"><span class="deck-inner"><span class="deck-face"><span class="cover-symbol">◐</span><h3>Shadow<br>Path</h3><p>Tarot</p><span class="mini-ornament"></span></span></span></button>
+      <button class="deck" style="--accent:#ff803d;--tilt:-2deg" data-title="Elemental Magic" data-symbol="△" data-accent="#ff803d" data-copy="Fire, water, air, and earth prompts for practical energy shifts." data-link="/elemental-magic"><span class="deck-inner"><span class="deck-face"><span class="cover-symbol">△</span><h3>Elemental<br>Magic</h3><p>Tarot</p><span class="mini-ornament"></span></span></span></button>
+      <button class="deck" style="--accent:#bc4dff;--tilt:-2deg" data-title="Timeless Vision" data-symbol="⌛" data-accent="#bc4dff" data-copy="A reflective deck for timing, memory, patience, and the next doorway." data-link="/timeless-vision"><span class="deck-inner"><span class="deck-face"><span class="cover-symbol">⌛</span><h3>Timeless<br>Vision</h3><p>Tarot</p><span class="mini-ornament"></span></span></span></button>
+    </div>
+  </section>
+  <div class="crystals"><div class="crystal one"></div><div class="crystal two"></div><div class="crystal three"></div><div class="crystal four"></div></div>
+</main>
+<div class="overlay" id="deckOverlay" aria-hidden="true">
+  <div class="modal-wrap" id="modalWrap">
+    <div class="large-deck" id="largeDeck">
+      <article class="large-card" id="largeCard">
+        <button class="x-close" id="closeOverlay" type="button" aria-label="Close">×</button>
+        <span class="large-symbol" id="largeSymbol">☾</span>
+        <div id="largeTextBlock">
+          <h2 class="large-title">Lunar Dreams</h2>
+          <div class="large-kicker">Tarot Deck</div>
+        </div>
+        <span class="mini-ornament" id="largeOrnament"></span>
+      </article>
+    </div>
+    <div class="modal-actions">
+      <a class="select-link" id="selectLink" href="/lunar-dreams">Choose Deck</a>
+      <button class="flip-btn" id="flipBtn" type="button">Read Back</button>
+    </div>
+  </div>
+</div>
+<script>
+const decks=document.querySelectorAll('.deck');
+const overlay=document.getElementById('deckOverlay');
+const modalWrap=document.getElementById('modalWrap');
+const largeCard=document.getElementById('largeCard');
+const largeSymbol=document.getElementById('largeSymbol');
+const largeTextBlock=document.getElementById('largeTextBlock');
+const largeOrnament=document.getElementById('largeOrnament');
+const selectLink=document.getElementById('selectLink');
+const flipBtn=document.getElementById('flipBtn');
+const closeOverlay=document.getElementById('closeOverlay');
+let activeDeck=null;
+let showingBack=false;
+function safeText(value){return String(value || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+function renderFront(){
+  if(!activeDeck)return;
+  showingBack=false;
+  modalWrap.classList.remove('is-back');
+  largeCard.classList.remove('back-mode');
+  largeSymbol.textContent=activeDeck.symbol;
+  largeTextBlock.innerHTML='<h2 class="large-title">'+safeText(activeDeck.title)+'</h2><div class="large-kicker">Tarot Deck</div>';
+  largeOrnament.style.display='block';
+  flipBtn.textContent='Read Back';
+}
+function renderBack(){
+  if(!activeDeck)return;
+  showingBack=true;
+  modalWrap.classList.add('is-back');
+  largeCard.classList.add('back-mode');
+  largeSymbol.textContent=activeDeck.symbol;
+  largeTextBlock.innerHTML='<h2 class="large-title">'+safeText(activeDeck.title)+'</h2><p class="large-copy">'+safeText(activeDeck.copy)+'</p>';
+  largeOrnament.style.display='none';
+  flipBtn.textContent='View Cover';
+}
+function openDeck(deck){
+  activeDeck={title:deck.dataset.title,symbol:deck.dataset.symbol,accent:deck.dataset.accent,copy:deck.dataset.copy,link:deck.dataset.link};
+  modalWrap.style.setProperty('--activeAccent',activeDeck.accent);
+  selectLink.href=activeDeck.link;
+  renderFront();
+  overlay.classList.add('is-open');
+  overlay.setAttribute('aria-hidden','false');
+}
+function closeDeck(){
+  overlay.classList.remove('is-open');
+  overlay.setAttribute('aria-hidden','true');
+  modalWrap.classList.remove('is-back');
+  activeDeck=null;
+  showingBack=false;
+}
+decks.forEach(deck=>deck.addEventListener('click',()=>openDeck(deck)));
+flipBtn.addEventListener('click',()=>showingBack ? renderFront() : renderBack());
+closeOverlay.addEventListener('click',closeDeck);
+overlay.addEventListener('click',event=>{if(event.target===overlay)closeDeck();});
+window.addEventListener('keydown',event=>{if(event.key==='Escape')closeDeck();});
+</script>
+</body>
+</html>
